@@ -6,6 +6,7 @@ import {stringToNumArr} from "./StringToNumArr";
 import {binaryAddition} from "./BinaryAddition";
 import {InstructionR} from "./InstructionR";
 import {InstructionI} from "./InstructionI";
+import {InstructionJ} from "./InstructionJ";
 var list = new ArrayList(10);
 list.add("张三");
 list.add("李四");
@@ -122,3 +123,90 @@ console.log(instruction.getBinIns());
 
 let instruction1 = new InstructionI("addi $1,$2,10");
 console.log(instruction1.getBinIns());
+
+let instruction2 = new InstructionI("addiu $1,$2,10");
+console.log(instruction2.getBinIns());
+
+let instruction3 = new InstructionR("addu $1,$2,$3");
+console.log(instruction3.getBinIns());
+
+let instruction4 = new InstructionR("and $1,$2,$3");
+console.log(instruction4.getBinIns());
+
+let instruction5 = new InstructionI("andi $1,$2,20");
+console.log(instruction5.getBinIns());
+
+let instruction6 = new InstructionI("beq $1,$2,25");
+console.log(instruction6.getBinIns());
+
+let instruction7 = new InstructionI("bne $1,$2,25");
+console.log(instruction7.getBinIns());
+
+let instruction8 = new InstructionJ("j 2500");
+console.log(instruction8.getBinIns());
+
+let instruction9 = new InstructionJ("jal 2500");
+console.log(instruction9.getBinIns());
+
+let instruction10 = new InstructionR("jr $31");
+console.log(instruction10.getBinIns());
+
+let instruction11 = new InstructionI("lbu $1,20($2)");
+console.log(instruction11.getBinIns());
+
+let instruction12 = new InstructionI("lhu $1,20($2)");
+console.log(instruction12.getBinIns());
+
+let instruction13 = new InstructionI("ll $1,20($2)");
+console.log(instruction13.getBinIns());
+
+let instruction14 = new InstructionI("lui $1,20");
+console.log(instruction14.getBinIns());
+
+let instruction15 = new InstructionI("lw $1,20($2)");
+console.log(instruction15.getBinIns());
+
+let instruction16 = new InstructionR("nor $1,$2,$3");
+console.log(instruction16.getBinIns());
+
+let instruction17 = new InstructionR("or $1,$2,$3");
+console.log(instruction17.getBinIns());
+
+let instruction18 = new InstructionI("ori $1,$2,20");
+console.log(instruction18.getBinIns());
+
+let instruction19 = new InstructionR("slt $1,$2,$3");
+console.log(instruction19.getBinIns());
+
+let instruction20 = new InstructionI("slti $1,$2,20");
+console.log(instruction20.getBinIns());
+
+let instruction21 = new InstructionI("sltiu $1,$2,20");
+console.log(instruction21.getBinIns());
+
+let instruction22 = new InstructionR("sltu $1,$2,$3");
+console.log(instruction22.getBinIns());
+
+let instruction23 = new InstructionR("sll $1,$2,10");
+console.log(instruction23.getBinIns());
+
+let instruction24 = new InstructionR("srl $1,$2,10");
+console.log(instruction24.getBinIns());
+
+let instruction25 = new InstructionI("sb $1,20($2)");
+console.log(instruction25.getBinIns());
+
+let instruction26 = new InstructionI("sc $1,20($2)");
+console.log(instruction26.getBinIns());
+
+let instruction27 = new InstructionI("sh $1,20($2)");
+console.log(instruction27.getBinIns());
+
+let instruction28 = new InstructionI("sw $1,20($2)");
+console.log(instruction28.getBinIns());
+
+let instruction29 = new InstructionR("sub $1,$2,$3");
+console.log(instruction29.getBinIns());
+
+let instruction30 = new InstructionR("subu $1,$2,$3");
+console.log(instruction30.getBinIns());
