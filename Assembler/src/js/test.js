@@ -9,6 +9,9 @@ const BinaryAddition_1 = require("./BinaryAddition");
 const InstructionR_1 = require("./InstructionR");
 const InstructionI_1 = require("./InstructionI");
 const InstructionJ_1 = require("./InstructionJ");
+const DecoderForR_1 = require("./DecoderForR");
+const DecoderForI_1 = require("./DecoderForI");
+const DecoderForJ_1 = require("./DecoderForJ");
 var list = new ArrayList_1.ArrayList(10);
 list.add("张三");
 list.add("李四");
@@ -159,3 +162,36 @@ let instruction29 = new InstructionR_1.InstructionR("sub $1,$2,$3");
 console.log(instruction29.getBinIns());
 let instruction30 = new InstructionR_1.InstructionR("subu $1,$2,$3");
 console.log(instruction30.getBinIns());
+console.log("--------------------------");
+let decoderForR = DecoderForR_1.DecoderForR.getDecoder();
+decoderForR.setIns("add $s1,$s2,$s3");
+let binIns1 = "origin";
+if (decoderForR.validate() == true) {
+    decoderForR.decode();
+    binIns1 = decoderForR.getBinIns();
+}
+console.log(binIns1);
+let instructionCom1 = new InstructionR_1.InstructionR("add $17,$18,$19");
+console.log(instructionCom1.getBinIns());
+console.log("-------------------------");
+let decoderForI = DecoderForI_1.DecoderForI.getDecoder();
+decoderForI.setIns("addi $s1,$s2,31");
+let binIns2 = "origin";
+if (decoderForI.validate() == true) {
+    decoderForI.decode();
+    binIns2 = decoderForI.getBinIns();
+}
+console.log(binIns2);
+let instructionCom2 = new InstructionI_1.InstructionI("addi $17,$18,31");
+console.log(instructionCom2.getBinIns());
+console.log("--------------------------");
+let decoderForJ = DecoderForJ_1.DecoderForJ.getDecoder();
+decoderForJ.setIns("j 10000");
+let binIns3 = "origin";
+if (decoderForJ.validate() == true) {
+    decoderForJ.decode();
+    binIns3 = decoderForJ.getBinIns();
+}
+console.log(binIns3);
+let instructionCom3 = new InstructionJ_1.InstructionJ("j 10000");
+console.log(instructionCom3.getBinIns());

@@ -12,9 +12,6 @@ class Decoder {
         var posOfSpace = this.ins.indexOf(" ");
         this.operator = ins.substring(0, posOfSpace);
     }
-    setBinIns(binIns) {
-        this.binIns = binIns;
-    }
     getIns() {
         return this.ins;
     }

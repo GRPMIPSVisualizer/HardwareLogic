@@ -3,26 +3,22 @@ export abstract class Decoder {
     protected operator: string = "";
     protected binIns: string = "";
 
-    setIns(ins: string): void {
+    public setIns(ins: string): void {
         this.ins = ins;
         
         var posOfSpace: number = this.ins.indexOf(" ");
         this.operator = ins.substring(0, posOfSpace);
     }
 
-    setBinIns(binIns: string): void {
-        this.binIns = binIns;
-    }
-
-    getIns(): string {
+    public getIns(): string {
         return this.ins;
     }
 
-    getBinIns(): string {
+    public getBinIns(): string {
         return this.binIns;
     }
 
-    abstract validate(): boolean;
+    public abstract validate(): boolean;
 
-    abstract decode(): void;
+    public abstract decode(): void;
 }

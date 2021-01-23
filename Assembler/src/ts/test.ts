@@ -7,6 +7,9 @@ import {binaryAddition} from "./BinaryAddition";
 import {InstructionR} from "./InstructionR";
 import {InstructionI} from "./InstructionI";
 import {InstructionJ} from "./InstructionJ";
+import {DecoderForR} from "./DecoderForR";
+import {DecoderForI} from "./DecoderForI";
+import {DecoderForJ} from "./DecoderForJ";
 var list = new ArrayList(10);
 list.add("张三");
 list.add("李四");
@@ -210,3 +213,43 @@ console.log(instruction29.getBinIns());
 
 let instruction30 = new InstructionR("subu $1,$2,$3");
 console.log(instruction30.getBinIns());
+
+console.log("--------------------------");
+
+let decoderForR: DecoderForR = DecoderForR.getDecoder();
+decoderForR.setIns("add $s1,$s2,$s3");
+let binIns1: string = "origin";
+if (decoderForR.validate() == true) {
+    decoderForR.decode();
+    binIns1 = decoderForR.getBinIns();
+}
+console.log(binIns1);
+
+let instructionCom1 = new InstructionR("add $17,$18,$19");
+console.log(instructionCom1.getBinIns());
+
+console.log("-------------------------");
+let decoderForI: DecoderForI = DecoderForI.getDecoder();
+decoderForI.setIns("addi $s1,$s2,31");
+let binIns2: string = "origin";
+if (decoderForI.validate() == true) {
+    decoderForI.decode();
+    binIns2 = decoderForI.getBinIns();
+}
+console.log(binIns2);
+
+let instructionCom2 = new InstructionI("addi $17,$18,31");
+console.log(instructionCom2.getBinIns());
+
+console.log("--------------------------");
+let decoderForJ: DecoderForJ = DecoderForJ.getDecoder();
+decoderForJ.setIns("j 10000");
+let binIns3: string = "origin";
+if (decoderForJ.validate() == true) {
+    decoderForJ.decode();
+    binIns3 = decoderForJ.getBinIns();
+}
+console.log(binIns3);
+
+let instructionCom3 = new InstructionJ("j 10000");
+console.log(instructionCom3.getBinIns());
