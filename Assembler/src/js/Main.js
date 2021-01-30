@@ -9,7 +9,7 @@ const Assembler_1 = require("./Assembler");
 const InstructionR_1 = require("./InstructionR");
 let assembler = Assembler_1.Assembler.getAssembler();
 let binIns = "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX";
-assembler.setIns("add $s1,$s2,$s3");
+assembler.setIns("addi $s1,$s2,32768");
 if (assembler.assemble() == true) {
     binIns = assembler.getBinIns();
 }

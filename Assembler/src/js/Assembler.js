@@ -24,6 +24,11 @@ class Assembler {
         return this.binIns;
     }
     assemble() {
+        let patt = /[^a-z\s\$0-9\,\(\)\n\-]/;
+        if (patt.test(this.ins)) {
+            console.log("Error 9 in Assembler. Unrecognized character.");
+            return false;
+        }
         let posOfSpace = this.ins.indexOf(" ");
         let operator = this.ins.substring(0, posOfSpace);
         if (MapForCommaNum_1.MapForCommaNum.getMap().has(operator)) {

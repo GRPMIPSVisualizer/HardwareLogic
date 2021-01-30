@@ -28,6 +28,11 @@ export class Assembler {
     }
 
     public assemble(): boolean {
+        let patt = /[^a-z\s\$0-9\,\(\)\n\-]/;
+        if (patt.test(this.ins)) {
+            console.log("Error 9 in Assembler. Unrecognized character.");
+            return false;
+        }
         let posOfSpace: number = this.ins.indexOf(" ");
         let operator: string = this.ins.substring(0,posOfSpace);
         if (MapForCommaNum.getMap().has(operator)) {

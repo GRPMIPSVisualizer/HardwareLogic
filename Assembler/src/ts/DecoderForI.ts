@@ -21,6 +21,10 @@ export class DecoderForI extends Decoder {
         let IMM: string = "";
         if (this.operator == "lui") {
             let operands: string[] = this.ins.substring(posOfSpace + 1, this.ins.length).split(",", 2);
+            if (+operands[1] > 65535 || +operands[1] < 0) {
+                console.log("Error 6 in DecoderForI. Immediate out of range.");
+                return false;
+            }
             operandRT = operands[0];
             IMM = operands[1];
         } else if (this.operator == "beq" || this.operator == "bne") {
@@ -35,6 +39,12 @@ export class DecoderForI extends Decoder {
                    this.operator == "slti" ||
                    this.operator == "sltiu" ) {
             let operands: string[] = this.ins.substring(posOfSpace + 1, this.ins.length).split(",", 3);
+            if (this.operator == "slti" || this.operator == "sltiu") {
+                if (+operands[2] > 32767 || +operands[2] < -32768) {
+                    console.log("Error 7 in DecoderForI. Immediate out of range.");
+                    return false;
+                }
+            }
             operandRT = operands[0];
             operandRS = operands[1];
             IMM = operands[2];
@@ -53,7 +63,7 @@ export class DecoderForI extends Decoder {
             IMM = operands[1].substring(0, leftBracket);
         }
 
-        let patt1 = /^[0-9]+$/;
+        let patt1 = /^[0-9-]+$/;
         let patt2 = /^[a-z0-9]+$/;
 
         if(!patt1.test(IMM)) {
