@@ -4,9 +4,10 @@
 //immediate立即数的转码方式 取值范围 beq bne 算数指令 逻辑指令 DecoderForI
 //address的取值范围 DecoderForJ
 import {Assembler} from "./Assembler";
-import {InstructionR} from "./InstructionR";
+import {InstructionI} from "./InstructionI";
 let assembler: Assembler = Assembler.getAssembler();
-assembler.setSource("addi $s1,$s2,10");
+assembler.setSource("main:" + "\n" + "addi $s1,$s2,10" + "\n" + "j main");
+//assembler.setSource("addi $s1,$s2,10");
 // console.log(assembler.getSource().size());
 // console.log(assembler.getBasic().size());
 if(assembler.assemble() == true) {
@@ -17,5 +18,5 @@ if(assembler.assemble() == true) {
     console.log("Error");
 }
 
-let instruction: InstructionR = new InstructionR("addi $17,$18,10");
+let instruction: InstructionI = new InstructionI("addi $17,$18,10");
 console.log(instruction.getBinIns());

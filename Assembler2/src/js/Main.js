@@ -6,9 +6,10 @@ Object.defineProperty(exports, "__esModule", { value: true });
 //immediate立即数的转码方式 取值范围 beq bne 算数指令 逻辑指令 DecoderForI
 //address的取值范围 DecoderForJ
 const Assembler_1 = require("./Assembler");
-const InstructionR_1 = require("./InstructionR");
+const InstructionI_1 = require("./InstructionI");
 let assembler = Assembler_1.Assembler.getAssembler();
-assembler.setSource("addi $s1,$s2,10");
+assembler.setSource("main:" + "\n" + "addi $s1,$s2,10" + "\n" + "j main");
+//assembler.setSource("addi $s1,$s2,10");
 // console.log(assembler.getSource().size());
 // console.log(assembler.getBasic().size());
 if (assembler.assemble() == true) {
@@ -19,5 +20,5 @@ if (assembler.assemble() == true) {
 else {
     console.log("Error");
 }
-let instruction = new InstructionR_1.InstructionR("addi $17,$18,10");
+let instruction = new InstructionI_1.InstructionI("addi $17,$18,10");
 console.log(instruction.getBinIns());

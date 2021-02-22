@@ -34,10 +34,53 @@ export class Assembler {
         let sourceIns = source.split("\n");
         let i: number;
         let patt = /^[\s]$/;
+
+        let label: string;
+        let mapForLabel: Map<string, string> = new Map();
+        let address: string = "4194304";
+        let posOfSpace: number;
+        let operator: string;
+        let jumpLabel: string;
+
         for (i = 0; i < sourceIns.length; i++) {
             if (sourceIns[i] == "" || patt.test(sourceIns[i])) {
                 continue;
             } else {
+                posOfSpace = sourceIns[i].indexOf(" ");
+                operator = sourceIns[i].substring(0, posOfSpace);
+                if (sourceIns[i].substring(sourceIns[i].length - 1, sourceIns[i].length) == ":") {
+                    label = sourceIns[i].substring(0, sourceIns[i].lastIndexOf(":")).trim();
+                    if (label.search(" ") != -1) {
+                        console.log("Error 9 in Assembler. Label unrecognized.");
+                    } else {
+                        mapForLabel.set(label, address);
+                        continue;
+                    }
+                } else if (operator == "j" || operator == "jal") {
+                    jumpLabel = sourceIns[i].substring(posOfSpace, sourceIns[i].length).trim();
+                    if (mapForLabel.has(jumpLabel)) {
+                        if (operator == "j") {
+                            sourceIns[i] = "j " + mapForLabel.get(jumpLabel);
+                        } else {
+                            sourceIns[i] = "jal " + mapForLabel.get(jumpLabel);
+                        }
+                        address = (+address + 4).toFixed();
+                    } else {
+                        console.log("Error 10 in Assembler. Label is not found.");
+                    }
+                } else if (operator == "beq" || operator == "bne") {
+                    jumpLabel = sourceIns[i].substring(sourceIns[i].lastIndexOf(","), sourceIns[i].length).trim();
+                    if (mapForLabel.has(jumpLabel)) {
+                        if (operator == "beq") {
+                            sourceIns[i] = "beq" + sourceIns[i].substring(posOfSpace, sourceIns[i].lastIndexOf(",")) + mapForLabel.get(jumpLabel);
+                        } else {
+                            sourceIns[i] = "bne" + sourceIns[i].substring(posOfSpace, sourceIns[i].lastIndexOf(",")) + mapForLabel.get(jumpLabel);
+                        }
+                        address = (+address + 4).toFixed();
+                    } else {
+                        console.log("Error 11 in Assembler. Label is not found.");
+                    }
+                }
                 this.source.add(sourceIns[i]);
                 this.basic.add(trimSpace(sourceIns[i]));
             }

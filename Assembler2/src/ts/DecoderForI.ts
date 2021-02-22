@@ -59,7 +59,7 @@ export class DecoderForI extends Decoder {
          
         if (!patt1.test(IMM.charAt(0)) && IMM.charAt(0) != "+" && IMM.charAt(0) != "-") {
             console.log("Error 2 in DecoderForI. Invalid immediate number.");
-        } else if (+IMM <= 0|| +IMM >= 0) {
+        } else if (+IMM <= -32768|| +IMM >= 32767) {
             console.log("Error 3 in DecoderForI. Invalid immediate number. Out of range.");
         }
         
