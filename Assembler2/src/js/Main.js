@@ -8,7 +8,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const Assembler_1 = require("./Assembler");
 const InstructionI_1 = require("./InstructionI");
 let assembler = Assembler_1.Assembler.getAssembler();
-assembler.setSource("main:" + "\n" + "addi $s1,$s2,10" + "\n" + "j main");
+assembler.setSource("beq $t1,$t2,main" + "\n" + "main:" + "\n" + "addi $s1,$s2,10");
 //assembler.setSource("addi $s1,$s2,10");
 // console.log(assembler.getSource().size());
 // console.log(assembler.getBasic().size());

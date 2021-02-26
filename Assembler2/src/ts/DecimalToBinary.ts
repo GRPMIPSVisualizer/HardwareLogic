@@ -16,7 +16,10 @@ export function decimalToBinary(decimal: number, numOfBits: number) {
     let isNegative: number = 0;
 
     if (decimal === 0) {
-        return "0"
+        for (let i = 0; i < numOfBits; i++) {
+            binaryString = binaryString + "0";
+        }
+        return binaryString;
     }
 
     if (decimal < 0) {

@@ -6,7 +6,7 @@
 import {Assembler} from "./Assembler";
 import {InstructionI} from "./InstructionI";
 let assembler: Assembler = Assembler.getAssembler();
-assembler.setSource("main:" + "\n" + "addi $s1,$s2,10" + "\n" + "j main");
+assembler.setSource("beq $t1,$t2,main" + "\n" + "main:" + "\n" + "addi $s1,$s2,10");
 //assembler.setSource("addi $s1,$s2,10");
 // console.log(assembler.getSource().size());
 // console.log(assembler.getBasic().size());

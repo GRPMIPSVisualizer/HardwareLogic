@@ -17,7 +17,10 @@ function decimalToBinary(decimal, numOfBits) {
     let binaryString = '';
     let isNegative = 0;
     if (decimal === 0) {
-        return "0";
+        for (let i = 0; i < numOfBits; i++) {
+            binaryString = binaryString + "0";
+        }
+        return binaryString;
     }
     if (decimal < 0) {
         decimal = -decimal;

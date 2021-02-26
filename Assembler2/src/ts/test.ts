@@ -1,8 +1,6 @@
 import {ArrayList} from "./ArrayList";
 import {decimalToBinary} from "./DecimalToBinary";
 import {transformZeroOne } from "./TransformZeroOne";
-import {numArrToString} from "./NumArrToString";
-import {stringToNumArr} from "./StringToNumArr";
 import {binaryAddition} from "./BinaryAddition";
 import {InstructionR} from "./InstructionR";
 import {InstructionI} from "./InstructionI";
@@ -74,15 +72,11 @@ console.log(operands[0]);
 console.log(operands[1]);
 console.log(operands[2]);
 
-console.log(numArrToString([0,1,0,1,1,0,0,1]));
-
 let arr: Array<number> = [];
 arr.push(0);    
 arr.push(1);
 arr.push(2);
 console.log(arr);
-
-console.log(stringToNumArr("0110011"));
 
 console.log(transformZeroOne("1000111"));
 
