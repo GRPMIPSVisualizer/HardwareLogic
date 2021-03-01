@@ -33,6 +33,7 @@ export class Assembler {
     public setSource(source: string): void {
         let sourceIns = source.split("\n");
         let i: number;
+        let j: number;
         let patt = /^[\s]$/;
 
         for (i = 0; i < sourceIns.length; i++) {
@@ -49,6 +50,8 @@ export class Assembler {
         let labelCounter: number = 0;
         let mapForCounter: Map<string, string> = new Map();
         let relativeJump: number = 0;
+        let patt2 = /^[0-9]+$/;
+        let labelFlag: boolean = true;
 
         for (i = 0; i < sourceIns.length; i++) {
             if (sourceIns[i] == "" || patt.test(sourceIns[i])) {
@@ -76,28 +79,55 @@ export class Assembler {
                 this.source.add(sourceIns[i]);
                 if (operator == "j" || operator == "jal") {
                     jumpLabel = sourceIns[i].substring(posOfSpace, sourceIns[i].length).trim();
-                    if (mapForLabel.has(jumpLabel)) {
-                        if (operator == "j") {
-                            sourceIns[i] = "j " + mapForLabel.get(jumpLabel);
+                    for (j = 0; j < jumpLabel.length; j++) {
+                        if (!patt2.test(jumpLabel.charAt(j))) {
+                            labelFlag = true;
+                            break;
                         } else {
-                            sourceIns[i] = "jal " + mapForLabel.get(jumpLabel);
+                            labelFlag = false;
                         }
-                        address = (+address + 4).toFixed();
-                    } else {
-                        console.log("Error 10 in Assembler. Label is not found.");
                     }
+                    if (labelFlag) {
+                        if (mapForLabel.has(jumpLabel)) {
+                            if (operator == "j") {
+                                sourceIns[i] = "j " + mapForLabel.get(jumpLabel);
+                            } else {
+                                sourceIns[i] = "jal " + mapForLabel.get(jumpLabel);
+                            }
+                            address = (+address + 4).toFixed();
+                        } else {
+                            console.log("Error 10 in Assembler. Label is not found.");
+                        }
+                    } else {
+                        address = (+address + 4).toFixed();
+                    } 
                 } else if (operator == "beq" || operator == "bne") {
                     jumpLabel = sourceIns[i].substring(sourceIns[i].lastIndexOf(",") + 1, sourceIns[i].length).trim();
-                    if (mapForLabel.has(jumpLabel)) {
-                        relativeJump = +(mapForCounter.get(jumpLabel) + "") - instructionCounter - 1;
-                        if (operator == "beq") {
-                            sourceIns[i] = "beq" + sourceIns[i].substring(posOfSpace, sourceIns[i].lastIndexOf(",") + 1) + relativeJump.toFixed();
-                        } else {
-                            sourceIns[i] = "bne" + sourceIns[i].substring(posOfSpace, sourceIns[i].lastIndexOf(",") + 1) + relativeJump.toFixed();
+                    for (j = 0; j < jumpLabel.length; j++) {
+                        if (j == 0 && jumpLabel.charAt(0) == "-") {
+                            continue;
                         }
-                        address = (+address + 4).toFixed();
+                        if (!patt2.test(jumpLabel.charAt(j))) {
+                            labelFlag = true;
+                            break;
+                        } else {
+                            labelFlag = false;
+                        }
+                    }
+                    if (labelFlag) {
+                        if (mapForLabel.has(jumpLabel)) {
+                            relativeJump = +(mapForCounter.get(jumpLabel) + "") - instructionCounter - 1;
+                            if (operator == "beq") {
+                                sourceIns[i] = "beq" + sourceIns[i].substring(posOfSpace, sourceIns[i].lastIndexOf(",") + 1) + relativeJump.toFixed();
+                            } else {
+                                sourceIns[i] = "bne" + sourceIns[i].substring(posOfSpace, sourceIns[i].lastIndexOf(",") + 1) + relativeJump.toFixed();
+                            }
+                            address = (+address + 4).toFixed();
+                        } else {
+                            console.log("Error 11 in Assembler. Label is not found.");
+                        }
                     } else {
-                        console.log("Error 11 in Assembler. Label is not found.");
+                        address = (+address + 4).toFixed();
                     }
                 }
                 this.basic.add(trimSpace(sourceIns[i]));
