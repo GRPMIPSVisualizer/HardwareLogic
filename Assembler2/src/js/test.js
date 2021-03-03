@@ -230,3 +230,6 @@ console.log("--------------------------");
 let str = "add $s1,  $s2, $s3";
 str = TrimSpace_1.trimSpace(str);
 console.log(str);
+console.log("--------------------------");
+str = "#sd";
+console.log(str.substring(0, str.search("#")));

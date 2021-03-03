@@ -30,9 +30,12 @@ class Assembler {
         let sourceIns = source.split("\n");
         let i;
         let j;
-        let patt = /^[\s]$/;
         for (i = 0; i < sourceIns.length; i++) {
             sourceIns[i] = sourceIns[i].trim();
+            if (sourceIns[i].search("#") != -1) {
+                let posOfHash = sourceIns[i].search("#");
+                sourceIns[i] = sourceIns[i].substring(0, posOfHash);
+            }
         }
         let label;
         let mapForLabel = new Map();
@@ -44,6 +47,7 @@ class Assembler {
         let labelCounter = 0;
         let mapForCounter = new Map();
         let relativeJump = 0;
+        let patt = /^[\s]$/;
         let patt2 = /^[0-9]+$/;
         let labelFlag = true;
         for (i = 0; i < sourceIns.length; i++) {

@@ -34,10 +34,13 @@ export class Assembler {
         let sourceIns = source.split("\n");
         let i: number;
         let j: number;
-        let patt = /^[\s]$/;
 
         for (i = 0; i < sourceIns.length; i++) {
             sourceIns[i] = sourceIns[i].trim();
+            if (sourceIns[i].search("#") != -1) {
+                let posOfHash = sourceIns[i].search("#");
+                sourceIns[i] = sourceIns[i].substring(0, posOfHash);
+            }
         }
 
         let label: string;
@@ -50,6 +53,7 @@ export class Assembler {
         let labelCounter: number = 0;
         let mapForCounter: Map<string, string> = new Map();
         let relativeJump: number = 0;
+        let patt = /^[\s]$/;
         let patt2 = /^[0-9]+$/;
         let labelFlag: boolean = true;
 
