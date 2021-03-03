@@ -37,7 +37,7 @@ export class InstructionR extends Instruction{
             this.rt = "00000";
             this.rd = "00000";
             this.shamt = "00000";
-        } else if (this.operator == "sll" || this.operator == "srl") {
+        } else if (this.operator == "sll" || this.operator == "srl" || this.operator == "sra") {
             let operands: string[] = ins.substring(posOfSpace + 1, ins.length).split(",", 3);
             this.operandRS = "";
             this.operandRD = operands[0];

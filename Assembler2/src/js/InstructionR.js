@@ -29,7 +29,7 @@ class InstructionR extends Instruction_1.Instruction {
             this.rd = "00000";
             this.shamt = "00000";
         }
-        else if (this.operator == "sll" || this.operator == "srl") {
+        else if (this.operator == "sll" || this.operator == "srl" || this.operator == "sra") {
             let operands = ins.substring(posOfSpace + 1, ins.length).split(",", 3);
             this.operandRS = "";
             this.operandRD = operands[0];

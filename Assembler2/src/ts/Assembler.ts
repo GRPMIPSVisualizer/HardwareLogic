@@ -12,11 +12,12 @@ export class Assembler {
     private decoderForR: DecoderForR = DecoderForR.getDecoder();
     private decoderForI: DecoderForI = DecoderForI.getDecoder();
     private decoderForJ: DecoderForJ = DecoderForJ.getDecoder();
+    private data: ArrayList<string> = new ArrayList<string>(10);
     private source: ArrayList<string> = new ArrayList<string>(10);
     private basic: ArrayList<string> = new ArrayList<string>(10);
     private bin: ArrayList<string> = new ArrayList<string>(10);
 
-    private constructor() {}
+    private constructor() { }
 
     public static getAssembler(): Assembler {
         return this.assembler;
@@ -30,17 +31,97 @@ export class Assembler {
         return this.basic;
     }
 
-    public setSource(source: string): void {
-        let sourceIns = source.split("\n");
+    public getData(): ArrayList<string> {
+        return this.data;
+    }
+
+    public setSource(input: string): boolean {
+        let result = true;
+        let sources = input.split("\n");
+        let sourceInsAl: ArrayList<string> = new ArrayList<string>(10);
         let i: number;
         let j: number;
 
-        for (i = 0; i < sourceIns.length; i++) {
-            sourceIns[i] = sourceIns[i].trim();
-            if (sourceIns[i].search("#") != -1) {
-                let posOfHash = sourceIns[i].search("#");
-                sourceIns[i] = sourceIns[i].substring(0, posOfHash);
+        //Deal with MIPS comments which start with a hash sign
+        for (i = 0; i < sources.length; i++) {
+            sources[i] = sources[i].trim();
+            if (sources[i].search("#") != -1) {
+                let posOfHash = sources[i].search("#");
+                sources[i] = sources[i].substring(0, posOfHash);
             }
+        }
+
+        //Deal with ".data" and ".text"
+        let indices: Array<number> = new Array<number>();
+        for (i = 0; i < sources.length; i++) {
+            if (sources[i] == ".data" || sources[i] == ".text") {
+                indices.push(i);
+            }
+        }
+        
+        if (indices.length == 0) {
+            for (i = 0; i < sources.length; i++) {
+                sourceInsAl.add(sources[i]);
+            }
+        } else {
+            for (i = 0; i < indices.length; i++) {
+                if (i == 0) {
+                    if (indices[0] != 0) {
+                        for (j = 0; j < indices[0]; j++) {
+                            sourceInsAl.add(sources[j]);
+                        }
+                    }
+                    if (indices.length == 1) {
+                        if (sources[0] == ".data") {
+                            for (j = 1; j < sources.length; j++) {
+                                this.data.add(sources[j]);
+                            }
+                        } else {
+                            for (j = 1; j < sources.length; j++) {
+                                sourceInsAl.add(sources[j]);
+                            }
+                        }
+                    } else {
+                        if (sources[0] == ".data") {
+                            for (j = 1; j < indices[1]; j++) {
+                                this.data.add(sources[j]);
+                            }
+                        } else {
+                            for (j = 1; j < indices[1]; j++) {
+                                sourceInsAl.add(sources[j]);
+                            }
+                        }
+                    }
+                } else {
+                    if (indices.length == (i + 1)) {
+                        if (sources[+indices[i]] == ".data") {
+                            for (j = +indices[i] + 1; j < sources.length; j++) {
+                                this.data.add(sources[j]);
+                            }
+                        } else {
+                            for (j = +indices[i] + 1; j < sources.length; j++) {
+                                sourceInsAl.add(sources[j]);
+                            }
+                        }
+                    } else {
+                        if (sources[+indices[i]] == ".data") {
+                            for (j = +indices[i] + 1; j < indices[i + 1]; j++) {
+                                this.data.add(sources[j]);
+                            }
+                        } else {
+                            for (j = +indices[i] + 1; j < indices[i + 1]; j++) {
+                                sourceInsAl.add(sources[j]);
+                            }
+                        }
+                    }
+                }
+
+            }
+        }
+
+        let sourceIns: Array<string> = [];
+        for (i = 0; i < sourceInsAl.size(); i++) {
+            sourceIns[i] = sourceInsAl.get(i).toString();
         }
 
         let label: string;
@@ -57,6 +138,56 @@ export class Assembler {
         let patt2 = /^[0-9]+$/;
         let labelFlag: boolean = true;
 
+        //Deal with pseudo instruction
+        for (i = 0; i < sourceIns.length; i++) {
+            if (sourceIns[i] == "syscall") {
+                continue;
+            }
+            posOfSpace = sourceIns[i].indexOf(" ");
+            operator = sourceIns[i].substring(0, posOfSpace);
+            if (MapForCommaNum.getMap().has(operator)) {
+                let expectedNumComma: number | undefined = MapForCommaNum.getMap().get(operator);
+                let actualNumComma = sourceIns[i].split(",").length - 1;
+                if (expectedNumComma == undefined) {
+                    console.log("Error 11 in Assembler. Instruction unrecognized.");
+                    return false;
+                } else if (expectedNumComma == actualNumComma) {
+                    let type: string | undefined = MapForInsType.getMap().get(operator);
+                    if (type == undefined) {
+                        console.log("Error 12 in Assembler.");
+                        return false;
+                    } else if (type == "P") {
+                        if (operator == "abs") {
+
+                        } else if (operator == "blt") {
+
+                        } else if (operator == "bgt") {
+
+                        } else if (operator == "ble") {
+
+                        } else if (operator == "neg") {
+
+                        } else if (operator == "negu") {
+
+                        } else if (operator == "not") {
+
+                        } else if (operator == "bge") {
+
+                        } else if (operator == "li") {
+
+                        } else if (operator == "la") {
+
+                        } else if (operator == "move") {
+
+                        } else if (operator == "sge") {
+
+                        } else if (operator == "sgt") {
+
+                        }
+                }
+        }
+
+
         for (i = 0; i < sourceIns.length; i++) {
             if (sourceIns[i] == "" || patt.test(sourceIns[i])) {
                 continue;
@@ -64,6 +195,7 @@ export class Assembler {
                 label = sourceIns[i].substring(0, sourceIns[i].lastIndexOf(":")).trim();
                 if (label.search(" ") != -1) {
                     console.log("Error 9 in Assembler. Label unrecognized.");
+                    return false;
                 } else {
                     mapForLabel.set(label, address);
                     labelCounter = instructionCounter;
@@ -101,10 +233,11 @@ export class Assembler {
                             address = (+address + 4).toFixed();
                         } else {
                             console.log("Error 10 in Assembler. Label is not found.");
+                            return false;
                         }
                     } else {
                         address = (+address + 4).toFixed();
-                    } 
+                    }
                 } else if (operator == "beq" || operator == "bne") {
                     jumpLabel = sourceIns[i].substring(sourceIns[i].lastIndexOf(",") + 1, sourceIns[i].length).trim();
                     for (j = 0; j < jumpLabel.length; j++) {
@@ -129,6 +262,7 @@ export class Assembler {
                             address = (+address + 4).toFixed();
                         } else {
                             console.log("Error 11 in Assembler. Label is not found.");
+                            return false;
                         }
                     } else {
                         address = (+address + 4).toFixed();
@@ -138,7 +272,9 @@ export class Assembler {
                 instructionCounter++;
             }
         }
+        return result;
     }
+    
 
     public getBin(): ArrayList<string> {
         return this.bin;
@@ -149,6 +285,10 @@ export class Assembler {
         let i: number;
         for (i = 0; i < this.basic.size(); i++) {
             let ins: string = this.basic.get(i).toString();
+            if (ins == "syscall") {
+                this.bin.add("00000000000000000000000000001100");
+                continue;
+            }
             let posOfSpace: number = ins.indexOf(" ");
             let operator: string = ins.substring(0, posOfSpace);
             if (MapForCommaNum.getMap().has(operator)) {

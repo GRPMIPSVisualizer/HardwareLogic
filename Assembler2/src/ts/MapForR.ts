@@ -18,6 +18,7 @@ export class MapForR {
             let sllFunct: string = "000000";
             let srlFunct: string = "000010";
             let jrFunct: string = "001000";
+            let sraFunct: string = "000011";
 
             this.map.set("add", addFunct);
             this.map.set("addu", adduFunct);
@@ -31,6 +32,7 @@ export class MapForR {
             this.map.set("sll", sllFunct);
             this.map.set("srl", srlFunct);
             this.map.set("jr", jrFunct);
+            this.map.set("sra", sraFunct);
         }
         return this.map;
     }

@@ -297,4 +297,13 @@ console.log(str);
 
 console.log("--------------------------");
 str = "#sd";
-console.log(str.substring(0,str.search("#")));
+console.log(str.substring(0, str.search("#")));
+
+console.log("--------------------------");
+let indices = new ArrayList(10);
+indices.add("100");
+console.log(indices.get(0));
+
+console.log("--------------------------");
+let instruction31 = new InstructionR("sra $1,$2,1");
+console.log(instruction31.getBinIns());

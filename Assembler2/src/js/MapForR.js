@@ -17,6 +17,7 @@ class MapForR {
             let sllFunct = "000000";
             let srlFunct = "000010";
             let jrFunct = "001000";
+            let sraFunct = "000011";
             this.map.set("add", addFunct);
             this.map.set("addu", adduFunct);
             this.map.set("sub", subFunct);
@@ -29,6 +30,7 @@ class MapForR {
             this.map.set("sll", sllFunct);
             this.map.set("srl", srlFunct);
             this.map.set("jr", jrFunct);
+            this.map.set("sra", sraFunct);
         }
         return this.map;
     }

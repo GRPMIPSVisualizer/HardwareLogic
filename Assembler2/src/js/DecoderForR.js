@@ -20,7 +20,7 @@ class DecoderForR extends Decoder_1.Decoder {
         if (this.operator == "jr") {
             operandRS = this.ins.substring(posOfSpace + 1, this.ins.length);
         }
-        else if (this.operator == "sll" || this.operator == "srl") {
+        else if (this.operator == "sll" || this.operator == "srl" || this.operator == "sra") {
             let operands = this.ins.substring(posOfSpace + 1, this.ins.length).split(",", 3);
             operandRD = operands[0];
             operandRT = operands[1];

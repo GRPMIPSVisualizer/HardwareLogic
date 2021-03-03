@@ -37,6 +37,21 @@ export class MapForCommaNum {
             this.map.set("sw", 1);
             this.map.set("j", 0);
             this.map.set("jal", 0);
+            this.map.set("sra", 2);
+
+            this.map.set("abs", 1);
+            this.map.set("blt", 2);
+            this.map.set("bgt", 2);
+            this.map.set("ble", 2);
+            this.map.set("neg", 1);
+            this.map.set("negu", 1);
+            this.map.set("not", 1);
+            this.map.set("bge", 2);
+            this.map.set("li", 1);
+            this.map.set("la", 1);
+            this.map.set("move", 1);
+            this.map.set("sge", 2);
+            this.map.set("sgt", 2);
         }
         return this.map;
     }
