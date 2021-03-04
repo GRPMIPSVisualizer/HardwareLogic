@@ -27,6 +27,9 @@ class Assembler {
     getSource() {
         return this.source;
     }
+    // public getSourceIns(): Array<string> {
+    //     return this.sourceIns;
+    // }
     getBasic() {
         return this.basic;
     }
@@ -68,6 +71,9 @@ class Assembler {
         for (i = 0; i < this.sources.length; i++) {
             if (this.sources[i] == ".data" || this.sources[i] == ".text") {
                 indices.push(i);
+            }
+            if (this.sources[i] == ".globl main") {
+                this.sources[i] = "";
             }
         }
         if (indices.length == 0) {
@@ -134,6 +140,11 @@ class Assembler {
                         }
                     }
                 }
+            }
+        }
+        for (i = 0; i < this.sourceInsAL.size(); i++) {
+            if (this.sourceInsAL.get(i) == "") {
+                this.sourceInsAL.remove(i);
             }
         }
         for (i = 0; i < this.sourceInsAL.size(); i++) {
