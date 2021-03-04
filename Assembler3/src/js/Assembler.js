@@ -84,25 +84,25 @@ class Assembler {
                         }
                     }
                     if (indices.length == 1) {
-                        if (this.sources[0] == ".data") {
-                            for (j = 1; j < this.sources.length; j++) {
+                        if (this.sources[indices[i]] == ".data") {
+                            for (j = indices[0] + 1; j < this.sources.length; j++) {
                                 this.data.add(this.sources[j]);
                             }
                         }
                         else {
-                            for (j = 1; j < this.sources.length; j++) {
+                            for (j = indices[0] + 1; j < this.sources.length; j++) {
                                 this.sourceInsAL.add(this.sources[j]);
                             }
                         }
                     }
                     else {
-                        if (this.sources[0] == ".data") {
-                            for (j = 1; j < indices[1]; j++) {
+                        if (this.sources[indices[i]] == ".data") {
+                            for (j = indices[0] + 1; j < indices[1]; j++) {
                                 this.data.add(this.sources[j]);
                             }
                         }
                         else {
-                            for (j = 1; j < indices[1]; j++) {
+                            for (j = indices[0] + 1; j < indices[1]; j++) {
                                 this.sourceInsAL.add(this.sources[j]);
                             }
                         }
@@ -110,25 +110,25 @@ class Assembler {
                 }
                 else {
                     if (indices.length == (i + 1)) {
-                        if (this.sources[+indices[i]] == ".data") {
-                            for (j = +indices[i] + 1; j < this.sources.length; j++) {
+                        if (this.sources[indices[i]] == ".data") {
+                            for (j = indices[i] + 1; j < this.sources.length; j++) {
                                 this.data.add(this.sources[j]);
                             }
                         }
                         else {
-                            for (j = +indices[i] + 1; j < this.sources.length; j++) {
+                            for (j = indices[i] + 1; j < this.sources.length; j++) {
                                 this.sourceInsAL.add(this.sources[j]);
                             }
                         }
                     }
                     else {
-                        if (this.sources[+indices[i]] == ".data") {
-                            for (j = +indices[i] + 1; j < indices[i + 1]; j++) {
+                        if (this.sources[indices[i]] == ".data") {
+                            for (j = indices[i] + 1; j < indices[i + 1]; j++) {
                                 this.data.add(this.sources[j]);
                             }
                         }
                         else {
-                            for (j = +indices[i] + 1; j < indices[i + 1]; j++) {
+                            for (j = indices[i] + 1; j < indices[i + 1]; j++) {
                                 this.sourceInsAL.add(this.sources[j]);
                             }
                         }

@@ -8,7 +8,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const ArrayList_1 = require("./ArrayList");
 const Assembler_1 = require("./Assembler");
 let assembler = Assembler_1.Assembler.getAssembler();
-assembler.setSources("addi $s1,$s2,100" + "\n" + ".text" + "\n" + "addi $s1,$s2,10" + "\n" + ".data" + "\n" + ".asciiz  10000" + "\n" + ".data" + "\n" + ".byte 7890" + "\n" + ".text" + "\n" + "beq $t1,$t2,-1" + "\n" + "main:" + "\n" + "addi $s1,$s2,10" + "\n" + "j 1");
+assembler.setSources("sub $s1, $s2, $s3" + "\n" + ".text" + "\n" + "addi $s1,$s2,100" + "\n" + ".text" + "\n" + "addi $s1,$s2,10" + "\n" + ".data" + "\n" + ".asciiz  10000" + "\n" + ".data" + "\n" + ".byte 7890" + "\n" + ".text" + "\n" + "beq $t1,$t2,-1" + "\n" + "main:" + "\n" + "addi $s1,$s2,10" + "\n" + "j 1");
 assembler.segmentDataText();
 //assembler.expandPseudo();
 assembler.translateLabel();
