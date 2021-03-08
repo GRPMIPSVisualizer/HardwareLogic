@@ -9,22 +9,32 @@ const ArrayList_1 = require("./ArrayList");
 const Assembler_1 = require("./Assembler");
 let assembler = Assembler_1.Assembler.getAssembler();
 assembler.setSources("sub $s1, $s2, $s3" + "\n" + ".text" + "\n" + ".globl main" + "\n" + "addi $s1,$s2,100" + "\n" + ".text" + "\n" + "addi $s1,$s2,10" + "\n" + ".data" + "\n" + ".asciiz  10000" + "\n" + ".data" + "\n" + ".byte 7890" + "\n" + ".text" + "\n" + "beq $t1,$t2,-1" + "\n" + "main:" + "\n" + "addi $s1,$s2,10" + "\n" + "j 1");
-assembler.segmentDataText();
-//assembler.expandPseudo();
-assembler.translateLabel();
-let printer = new ArrayList_1.ArrayList(10);
-let i;
-printer = assembler.getSource();
-for (i = 0; i < printer.size(); i++) {
-    console.log(printer.get(i));
+if (assembler.preprocess()) {
+    if (assembler.assemble()) {
+        let i;
+        let bin = new ArrayList_1.ArrayList(10);
+        bin = assembler.getBin();
+        for (i = 0; i < bin.size(); i++) {
+            console.log(bin.get(i).toString());
+        }
+    }
 }
-console.log("-----------------------");
-let printer2 = new ArrayList_1.ArrayList(10);
-printer2 = assembler.getData();
-for (i = 0; i < printer2.size(); i++) {
-    console.log(printer2.get(i));
-}
-console.log("-----------------------");
+
+// let printer = new ArrayList_1.ArrayList(10);
+// let i;
+// printer = assembler.getSourceInsAL();
+// for (i = 0; i < printer.size(); i++) {
+//     console.log(printer.get(i));
+// }
+// console.log("-----------------------");
+// let printer2 = new ArrayList_1.ArrayList(10);
+// printer2 = assembler.getData();
+// for (i = 0; i < printer2.size(); i++) {
+//     console.log(printer2.get(i));
+// }
+// console.log("-----------------------");
+
+
 // let printer3: Array<string> = [];
 // printer3 = assembler.getSourceIns();
 // for (i = 0; i < printer3.length; i++) {

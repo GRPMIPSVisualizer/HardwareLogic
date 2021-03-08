@@ -19,6 +19,12 @@ for (var i = 0; i < list.size(); i++) {
     console.log(list.get(i));
 }
 
+console.log("--------------测试添加--------------------");
+list.add(2, "杨超越");
+for (var i = 0; i < list.size(); i++) {
+    console.log(list.get(i));
+}
+
 console.log("-------------测试修改，下标1改为赵六-------------");
 list.update(1, "赵六");
 for (var i = 0; i < list.size(); i++) {
@@ -37,6 +43,8 @@ list.remove('张三');
 for (var i = 0; i < list.size(); i++) {
     console.log(list.get(i));
 }
+
+console.log("----------------------------");
 
 let nameSiteMapping = new Map();
  
@@ -307,3 +315,28 @@ console.log(indices.get(0));
 console.log("--------------------------");
 let instruction31 = new InstructionR("sra $1,$2,1");
 console.log(instruction31.getBinIns());
+
+console.log("--------------------------");
+let strArr = ["YCY", "QWE", "ASD"];
+console.log(strArr);
+strArr.splice(2, 0, "ZXC");
+console.log(strArr);
+
+console.log("--------------------------");
+str = "abs $t1,$t2";
+posOfSpace = str.indexOf(" ");
+console.log(str.substring(posOfSpace + 1).split(","));
+
+console.log("--------------------------");
+let strArr2: string[] = [];
+strArr2.push("abc");
+strArr2.push("qwe");
+strArr2.push("zxc");
+strArr2.push("asd");
+console.log(strArr2);
+strArr = strArr2;
+console.log(strArr);
+
+console.log("-------------------------");
+str = "main: ";
+console.log(str.trim().endsWith(":"));

@@ -17,19 +17,19 @@ class Assembler {
         this.data = new ArrayList_1.ArrayList(10); //The contents contained in the .data segment
         this.sourceInsAL = new ArrayList_1.ArrayList(10); //The contents contained in the .text segment in the form of an ArrayList
         this.sourceIns = []; //The contents stored in the .text segment in the form of an array
-        this.source = new ArrayList_1.ArrayList(10);
         this.basic = new ArrayList_1.ArrayList(10);
         this.bin = new ArrayList_1.ArrayList(10);
     }
     static getAssembler() {
         return this.assembler;
     }
-    getSource() {
-        return this.source;
+    //To be deleted
+    getSourceInsAL() {
+        return this.sourceInsAL;
     }
-    // public getSourceIns(): Array<string> {
-    //     return this.sourceIns;
-    // }
+    getSourceIns() {
+        return this.sourceIns;
+    }
     getBasic() {
         return this.basic;
     }
@@ -151,11 +151,27 @@ class Assembler {
             this.sourceIns[i] = this.sourceInsAL.get(i).toString();
         }
     }
+    storeData() {
+        let result = true;
+        let i;
+        for (i = 0; i < this.data.size(); i++) {
+            let ins = this.data.get(i).toString();
+            let posOfColon = ins.indexOf(":");
+            //先处理Label
+            //再处理.asciiz / .byte ........
+        }
+        return result;
+    }
+    /**
+     * Expand the pseudo instructions into basic instructions.
+     * @returns true if there is no error in the pseudo instructions, otherwise false
+     */
     expandPseudo() {
         let i;
         let result = true;
         let posOfSpace;
         let operator;
+        let temp = [];
         for (i = 0; i < this.sourceIns.length; i++) {
             if (this.sourceIns[i] == "syscall") {
                 continue;
@@ -172,38 +188,98 @@ class Assembler {
                 else if (expectedNumComma == actualNumComma) {
                     let type = MapForInsType_1.MapForInsType.getMap().get(operator);
                     if (type == undefined) {
-                        console.log("Error 12 in Assembler.");
+                        console.log("Error 12 in Assembler. Invalid instruction type.");
                         return false;
                     }
                     else if (type == "P") {
+                        let ins0 = "";
+                        let ins1 = "";
+                        let ins2 = "";
+                        let operands;
+                        let operand0 = "";
+                        let operand1 = "";
+                        let operand2 = "";
+                        operands = this.sourceIns[i].substring(posOfSpace + 1).split(",");
+                        if (operands[0] != "") {
+                            operand0 = operands[0];
+                        }
+                        if (operands[1] != "") {
+                            operand1 = operands[1];
+                        }
+                        if (operands[2] != "") {
+                            operand2 = operands[2];
+                        }
                         if (operator == "abs") {
+                            ins0 = "sra $1," + operand1 + ",31";
+                            ins1 = "xor " + operand0 + ",$1," + operand1;
+                            ins2 = "subu " + operand0 + "," + operand0 + ",$1";
                         }
                         else if (operator == "blt") {
+                            ins0 = "slt $1," + operand0 + "," + operand1;
+                            ins1 = "bne $1,$0," + operand2;
                         }
                         else if (operator == "bgt") {
+                            ins0 = "slt $1," + operand1 + "," + operand0;
+                            ins1 = "bne $1,$0," + operand2;
                         }
                         else if (operator == "ble") {
+                            ins0 = "slt $1," + operand1 + "," + operand0;
+                            ins1 = "beq $1,$0," + operand2;
                         }
                         else if (operator == "neg") {
+                            ins0 = "sub " + operand0 + ",$0," + operand1;
                         }
                         else if (operator == "negu") {
+                            ins0 = "subu " + operand0 + ",$0," + operand1;
                         }
                         else if (operator == "not") {
+                            ins0 = "nor " + operand0 + "," + operand1 + ",$0";
                         }
                         else if (operator == "bge") {
+                            ins0 = "slt $1," + operand0 + "," + operand1;
+                            ins1 = "beq $1,$0," + operand2;
                         }
                         else if (operator == "li") {
+                            ins0 = "addiu " + operand0 + ",$0," + operand1;
                         }
                         else if (operator == "la") {
+                            //la $reg, label
+                            //->
+                            //lui $1, first 16 bits of label
+                            //ori $reg, $1, last 16 bits of label　　　
                         }
                         else if (operator == "move") {
+                            ins0 = "addu " + operand0 + ",$0," + operand1;
                         }
                         else if (operator == "sge") {
+                            ins0 = "slt " + operand0 + "," + operand1 + "," + operand2;
+                            ins1 = "ori $1,$0,1";
+                            ins2 = "subu " + operand0 + ",$1," + operand0;
                         }
                         else if (operator == "sgt") {
+                            ins0 = "slt" + operand0 + "," + operand2 + "," + operand1;
+                        }
+                        if (ins0 != "") {
+                            temp.push(ins0);
+                        }
+                        if (ins1 != "") {
+                            temp.push(ins1);
+                        }
+                        if (ins2 != "") {
+                            temp.push(ins2);
                         }
                     }
+                    else {
+                        temp.push(this.sourceIns[i]);
+                    }
                 }
+            }
+            else if (this.sourceIns[i].trim().endsWith(":")) {
+                continue;
+            }
+            else {
+                console.log("Error. Unrecognized instruction.");
+                return false;
             }
         }
         return result;
@@ -251,7 +327,6 @@ class Assembler {
             else {
                 posOfSpace = this.sourceIns[i].indexOf(" ");
                 operator = this.sourceIns[i].substring(0, posOfSpace);
-                this.source.add(this.sourceIns[i]);
                 if (operator == "j" || operator == "jal") {
                     jumpLabel = this.sourceIns[i].substring(posOfSpace, this.sourceIns[i].length).trim();
                     for (j = 0; j < jumpLabel.length; j++) {
@@ -322,16 +397,24 @@ class Assembler {
         }
         return result;
     }
-    storeData() {
-        let result = true;
-        let i;
-        for (i = 0; i < this.data.size(); i++) {
-            let ins = this.data.get(i).toString();
-            let posOfColon = ins.indexOf(":");
-            //先处理Label
-            //再处理.asciiz / .byte ........
+    preprocess() {
+        this.segmentDataText();
+        if (this.storeData()) {
+            if (this.expandPseudo()) {
+                if (this.translateLabel()) {
+                    return true;
+                }
+                else {
+                    return false;
+                }
+            }
+            else {
+                return false;
+            }
         }
-        return result;
+        else {
+            return false;
+        }
     }
     assemble() {
         let result = true;

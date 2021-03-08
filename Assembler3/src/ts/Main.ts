@@ -8,14 +8,22 @@ import { Assembler } from "./Assembler";
 import { InstructionI } from "./InstructionI";
 let assembler: Assembler = Assembler.getAssembler();
 assembler.setSources("sub $s1, $s2, $s3" + "\n" + ".text" + "\n" + ".globl main" + "\n" + "addi $s1,$s2,100" + "\n" + ".text" + "\n" + "addi $s1,$s2,10" + "\n" + ".data" + "\n" + ".asciiz  10000" + "\n" + ".data" + "\n" + ".byte 7890" + "\n" + ".text" + "\n" + "beq $t1,$t2,-1" + "\n" + "main:" + "\n" + "addi $s1,$s2,10" + "\n" + "j 1");
-assembler.segmentDataText();
-//assembler.expandPseudo();
-assembler.translateLabel();
+if (assembler.preprocess()) {
+    if (assembler.assemble()) {
+        let i: number;
+        let bin: ArrayList<string> = new ArrayList<string>(10);
+        bin = assembler.getBin();
+        for (i = 0; i < bin.size(); i++) {
+            console.log(bin.get(i).toString());
+        }
+    }
+}
+
 
 
 let printer: ArrayList<string> = new ArrayList<string>(10);
 let i: number;
-printer = assembler.getSource();
+printer = assembler.getSourceInsAL();
 for (i = 0; i < printer.size(); i++) {
     console.log(printer.get(i));
 }
