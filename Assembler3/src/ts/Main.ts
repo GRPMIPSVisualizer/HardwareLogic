@@ -7,7 +7,8 @@ import { ArrayList } from "./ArrayList";
 import { Assembler } from "./Assembler";
 import { InstructionI } from "./InstructionI";
 let assembler: Assembler = Assembler.getAssembler();
-assembler.setSources("sub $s1, $s2, $s3" + "\n" + ".text" + "\n" + ".globl main" + "\n" + "addi $s1,$s2,100" + "\n" + ".text" + "\n" + "addi $s1,$s2,10" + "\n" + ".data" + "\n" + ".asciiz  10000" + "\n" + ".data" + "\n" + ".byte 7890" + "\n" + ".text" + "\n" + "beq $t1,$t2,-1" + "\n" + "main:" + "\n" + "addi $s1,$s2,10" + "\n" + "j 1");
+assembler.setSources(".data" + "\n" + "item:" + "\n" + ".byte 33,1" + "\n" + "main:" + "\n" + ".asciiz" + "\n" + "\"scc\"");
+//assembler.setSources("sub $s1, $s2, $s3" + "\n" + ".text" + "\n" + ".globl main" + "\n" + "addi $s1,$s2,100" + "\n" + ".text" + "\n" + "addi $s1,$s2,10" + "\n" + ".data" + "\n" + ".asciiz  10000" + "\n" + ".data" + "\n" + ".byte 7890" + "\n" + ".text" + "\n" + "beq $t1,$t2,main" + "\n" + "main:" + "addi $s1,$s2,10" + "\n" + "j main" + "\n" + "beq $t1,$t2,-1");
 if (assembler.preprocess()) {
     if (assembler.assemble()) {
         let i: number;
@@ -21,11 +22,11 @@ if (assembler.preprocess()) {
 
 
 
-let printer: ArrayList<string> = new ArrayList<string>(10);
+let printer: Array<string> = new Array<string>(10);
 let i: number;
-printer = assembler.getSourceInsAL();
-for (i = 0; i < printer.size(); i++) {
-    console.log(printer.get(i));
+printer = assembler.getSourceIns();
+for (i = 0; i < printer.length; i++) {
+    console.log(printer[i]);
 }
 
 console.log("-----------------------");

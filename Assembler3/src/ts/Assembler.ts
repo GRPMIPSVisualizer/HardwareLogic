@@ -18,6 +18,10 @@ export class Assembler {
     private sourceIns: Array<string> = []; //The contents stored in the .text segment in the form of an array
     private basic: ArrayList<string> = new ArrayList<string>(10);
     private bin: ArrayList<string> = new ArrayList<string>(10);
+    private mapForDataLabel: Map<string, string> = new Map();
+    private mapForWord: Map<string, number> = new Map();
+    private mapForAscii: Map<string, string> = new Map();
+    private mapForByte: Map<string, number> = new Map();
 
     private constructor() { }
 
@@ -156,15 +160,309 @@ export class Assembler {
         }
     }
 
+    public separateLabelIns(): boolean {
+        let result: boolean = true;
+        let posOfColon: number;
+        let patt = /^[\s]$/;
+        let pattLabel = /^[A-Za-z0-9._]+$/;
+        let pattnumber = /[0-9]/;
+        let i: number;
+        let label: string;
+        for (i = 0; i < this.sourceIns.length; i++) {
+            posOfColon = this.sourceIns[i].indexOf(":");
+            if (posOfColon != -1) {
+                label = this.sourceIns[i].substring(0, posOfColon).trim();
+                if (pattLabel.test(label) && pattnumber.test(label.charAt(0))) {
+                    console.log("Error 14 in Assembler. Invalid label.");
+                    return false;
+                } else if (this.sourceIns[i].substring(posOfColon + 1, this.sourceIns[i].length) == "" || !patt.test(this.sourceIns[i].substring(posOfColon + 1, this.sourceIns[i].length))) {
+                    this.sourceIns.splice(i, 1, label + ":", this.sourceIns[i].substring(posOfColon + 1, this.sourceIns[i].length));
+                }
+            }
+        }
+        return result;
+    }
+
+    public formatData(): boolean {
+        let result: boolean = true;
+        let i: number;
+        let posOfColon: number;
+        let posOfQuo: number;
+        let label: string;
+        let patt = /^[\s]$/;
+        let pattLabel = /^[A-Za-z0-9._]+$/;
+        let pattnumber = /[0-9]/;
+        let resultData: ArrayList<string> = new ArrayList<string>();
+        for (i = 0; i < this.data.size(); i++) {
+            posOfColon = this.data.get(i).toString().indexOf(":");
+            if (posOfColon != -1) {
+                label = this.data.get(i).toString().substring(0, posOfColon);
+                if (pattLabel.test(label) && pattnumber.test(label.charAt(0))) {
+                    console.log("Error 15 in Assembler. Invalid label.");
+                    return false;
+                }
+                if (this.data.get(i).toString().substring(posOfColon + 1, this.data.get(i).toString.length) == "" || !patt.test(this.data.get(i).toString().substring(posOfColon + 1, this.data.get(i).toString.length))) {
+                    if (i == this.data.size() - 1) {
+                        resultData.add(label + ":");
+                        return true;
+                    } else if (this.data.get(i + 1).toString().indexOf(":") != -1) {
+                        resultData.add(label + ":");
+                        continue;
+                    } else {
+                        if (this.data.get(i + 1).toString().trim() == ".word" || this.data.get(i + 1).toString().trim() == ".byte" || this.data.get(i + 1).toString().trim() == ".ascii" || this.data.get(i + 1).toString().trim() == ".asciiz") {
+                            if (i != this.data.size() - 2) {
+                                if (this.data.get(i + 2).toString().trim().charAt(0) != ".") {
+                                    resultData.add(label + ": " + this.data.get(i + 1).toString() + " " + this.data.get(i + 2).toString());
+                                    i = i + 2;
+                                    continue;
+                                }
+                            }
+                        } else {
+                            resultData.add(label + ": " + this.data.get(i + 1).toString());
+                            i++;
+                            continue;
+                        }
+                    }
+                } else {
+                    resultData.add(label + ": " + this.data.get(i).toString().substring(posOfColon + 1, this.data.get(i).toString.length));
+                }
+            } else {
+                if (this.data.get(i).toString().trim() == ".ascii" || this.data.get(i).toString().trim() == ".asciiz") {
+                    if (i == this.data.size() - 1) {
+                        return true;
+                    } else if (this.data.get(i + 1).toString().trim().charAt(0) == "\"" && this.data.get(i + 1).toString().trim().endsWith("\"")) {
+                        resultData.add(this.data.get(i).toString().trim() + " " + this.data.get(i + 1).toString().trim());
+                        i++;
+                        continue;
+                    } else {
+                        continue;
+                    }
+                } else if (this.data.get(i).toString().trim() == ".word") {
+                    if (i == this.data.size() - 1) {
+                        return true;
+                    } else if (pattnumber.test(this.data.get(i + 1).toString().trim())) {
+                        resultData.add(".word " + this.data.get(i + 1).toString().trim());
+                        i++;
+                        continue;
+                    } else {
+                        continue;
+                    }
+                } else if (this.data.get(i).toString().trim() == ".byte") {
+                    if (i == this.data.size() - 1) {
+                        return true;
+                    } else if (pattnumber.test(this.data.get(i + 1).toString().trim())) {
+                        resultData.add(".byte " + this.data.get(i + 1).toString().trim());
+                        i++;
+                        continue;
+                    } else {
+                        continue;
+                    }
+                }
+                posOfQuo = this.data.get(i).toString().indexOf("\"");
+                if (posOfQuo != -1) {
+                    resultData.add(this.data.get(i).toString().substring(0, posOfQuo).trim() + " " + this.data.get(i).toString().substring(posOfQuo, this.data.get(i).toString().length).trim());
+                    continue;
+                }
+                resultData.add(this.data.get(i).toString().trim());
+            }
+        }
+
+        for (i = 0; i < resultData.size(); i++) {
+            this.data.update(i, resultData.get(i).toString());
+        }
+        let sizeOfData: number = this.data.size();
+        if (sizeOfData > resultData.size()) {
+            for (i = resultData.size(); i < sizeOfData; i++) {
+                this.data.remove(i);
+            }
+        }
+        return result;
+    }
+
     public storeData(): boolean {
         let result: boolean = true;
         let i: number;
+        let j: number;
+        let label: string;
+        let address: string = "268500992";
+        let posOfSpace: number;
+        let dataIns: string;
+        let patt = /[0-9]/;
         for (i = 0; i < this.data.size(); i++) {
-            let ins: string =  this.data.get(i).toString();
+            let ins: string = this.data.get(i).toString();
             let posOfColon: number = ins.indexOf(":");
-            //先处理Label
-            //再处理.asciiz / .byte ........
+            if (posOfColon != -1) {
+                label = ins.substring(0, posOfColon);
+                this.mapForDataLabel.set(label, address);
+                let insAfterLabel = ins.substring(posOfColon + 2, ins.length);
+                posOfSpace = insAfterLabel.indexOf(" ");
+                dataIns = insAfterLabel.substring(0, posOfSpace);
+                if (dataIns == ".word") {
+                    if (insAfterLabel.substring(posOfSpace, ins.length).trim().indexOf(",") != -1) {
+                        let wordArray = insAfterLabel.substring(posOfSpace, ins.length).trim().split(",");
+                        for (j = 0; j < wordArray.length; j++) {
+                            if (!patt.test(wordArray[j])) {
+                                console.log("Error 18, Invalid instruction after .word.");
+                                return false;
+                            } else if (+wordArray[j] > 2147483647 || +wordArray[j] < -2147483648) {
+                                console.log("Error 19, .word value out of range.");
+                                return false;
+                            } else {
+                                this.mapForWord.set(address, +wordArray[j]);
+                                address = (+address + 4).toFixed();
+                            }
+                        }
+                    } else {
+                        if (insAfterLabel.substring(posOfSpace, ins.length).trim() == "") {
+                            continue;
+                        }
+                        if (patt.test(insAfterLabel.substring(posOfSpace, ins.length).trim())) {
+                            console.log("Error 16, Invalid instruction after .word.");
+                            return false;
+                        } else {
+                            let wordNumber: number = +ins.substring(posOfSpace, ins.length).trim();
+                            if (wordNumber > 2147483647 || wordNumber < -2147483648) {
+                                console.log("Error 17, .word value out of range.");
+                                return false;
+                            } else {
+                                this.mapForWord.set(address, wordNumber);
+                                address = (+address + 4).toFixed();
+                            }
+                        }
+                    }
+                } else if (dataIns == ".byte") {
+                    if (insAfterLabel.substring(posOfSpace, ins.length).trim().indexOf(",") != -1) {
+                        let byteArray = insAfterLabel.substring(posOfSpace, ins.length).trim().split(",");
+                        for (j = 0; j < byteArray.length; j++) {
+                            if (!patt.test(byteArray[j])) {
+                                console.log("Error 20, Invalid instruction after .byte.");
+                                return false;
+                            } else if (+byteArray[j] > 127 || +byteArray[j] < -128) {
+                                console.log("Error 21, .byte value out of range.");
+                                return false;
+                            } else {
+                                this.mapForByte.set(address, +byteArray[j]);
+                                address = (+address + 1).toFixed();
+                            }
+                        }
+                    } else {
+                        if (insAfterLabel.substring(posOfSpace, ins.length).trim() == "") {
+                            continue;
+                        }
+                        if (!patt.test(ins.substring(posOfSpace, ins.length).trim())) {
+                            console.log("Error 22, Invalid instruction after .word.");
+                            return false;
+                        } else {
+                            let byteNumber: number = +insAfterLabel.substring(posOfSpace, ins.length).trim();
+                            if (byteNumber > 127 || byteNumber < -128) {
+                                console.log("Error 23, .byte value out of range.");
+                                return false;
+                            } else {
+                                this.mapForWord.set(address, byteNumber);
+                                address = (+address + 1).toFixed();
+                            }
+                        }
+                    }
+                } else if (dataIns == ".ascii" || dataIns == ".asciiz") {
+                    if (insAfterLabel.substring(posOfSpace, ins.length).trim().charAt(0) != "\"" || !insAfterLabel.substring(posOfSpace, ins.length).trim().endsWith("\"")) {
+                        console.log("Error 24, invalid string after .ascii.");
+                        return false;
+                    } else {
+                        this.mapForAscii.set(address, insAfterLabel.substring(posOfSpace + 2, ins.length - 1));
+                        if (dataIns == ".ascii") {
+                            address = (+address + insAfterLabel.substring(posOfSpace + 2, ins.length - 1).length).toFixed();
+                        } else {
+                            address = (+address + insAfterLabel.substring(posOfSpace + 2, ins.length - 1).length + 1).toFixed();
+                        }
+                    }
+                }
+            } else {
+                posOfSpace = ins.indexOf(" ");
+                dataIns = ins.substring(0, posOfSpace);
+                if (dataIns == ".word") {
+                    if (ins.substring(posOfSpace, ins.length).trim().indexOf(",") != -1) {
+                        let wordArray = ins.substring(posOfSpace, ins.length).trim().split(",");
+                        for (j = 0; j < wordArray.length; j++) {
+                            if (!patt.test(wordArray[j])) {
+                                console.log("Error 18, Invalid instruction after .word.");
+                                return false;
+                            } else if (+wordArray[j] > 2147483647 || +wordArray[j] < -2147483648) {
+                                console.log("Error 19, .word value out of range.");
+                                return false;
+                            } else {
+                                this.mapForWord.set(address, +wordArray[j]);
+                                address = (+address + 4).toFixed();
+                            }
+                        }
+                    } else {
+                        if (ins.substring(posOfSpace, ins.length).trim() == "") {
+                            continue;
+                        }
+                        if (!patt.test(ins.substring(posOfSpace, ins.length).trim())) {
+                            console.log("Error 16, Invalid instruction after .word.");
+                            return false;
+                        } else {
+                            let wordNumber: number = +ins.substring(posOfSpace, ins.length).trim();
+                            if (wordNumber > 2147483647 || wordNumber < -2147483648) {
+                                console.log("Error 17, .word value out of range.");
+                                return false;
+                            } else {
+                                this.mapForWord.set(address, wordNumber);
+                                address = (+address + 4).toFixed();
+                            }
+                        }
+                    }
+                } else if (dataIns == ".byte") {
+                    if (ins.substring(posOfSpace, ins.length).trim().indexOf(",") != -1) {
+                        let byteArray = ins.substring(posOfSpace, ins.length).trim().split(",");
+                        for (j = 0; j < byteArray.length; j++) {
+                            if (!patt.test(byteArray[j])) {
+                                console.log("Error 20, Invalid instruction after .byte.");
+                                return false;
+                            } else if (+byteArray[j] > 127 || +byteArray[j] < -128) {
+                                console.log("Error 21, .byte value out of range.");
+                                return false;
+                            } else {
+                                this.mapForByte.set(address, +byteArray[j]);
+                                address = (+address + 1).toFixed();
+                            }
+                        }
+                    } else {
+                        if (ins.substring(posOfSpace, ins.length).trim() == "") {
+                            continue;
+                        }
+                        if (!patt.test(ins.substring(posOfSpace, ins.length).trim())) {
+                            console.log("Error 22, Invalid instruction after .word.");
+                            return false;
+                        } else {
+                            let byteNumber: number = +ins.substring(posOfSpace, ins.length).trim();
+                            if (byteNumber > 127 || byteNumber < -128) {
+                                console.log("Error 23, .byte value out of range.");
+                                return false;
+                            } else {
+                                this.mapForWord.set(address, byteNumber);
+                                address = (+address + 1).toFixed();
+                            }
+                        }
+                    }
+                } else if (dataIns == ".ascii" || dataIns == ".asciiz") {
+                    if (ins.substring(posOfSpace, ins.length).trim().charAt(0) != "\"" || !ins.substring(posOfSpace, ins.length).trim().endsWith("\"")) {
+                        console.log("Error 24, invalid string after .ascii.");
+                        return false;
+                    } else {
+                        this.mapForAscii.set(address, ins.substring(posOfSpace + 2, ins.length - 1));
+                        if (dataIns == ".ascii") {
+                            address = (+address + ins.substring(posOfSpace + 2, ins.length - 1).length).toFixed();
+                        } else {
+                            address = (+address + ins.substring(posOfSpace + 2, ins.length - 1).length + 1).toFixed();
+                        }
+                    }
+                }
+            }
+
         }
+        // console.log(this.mapForDataLabel.get("item"));
+        // console.log(this.mapForDataLabel.get("main"));
         return result;
     }
 
@@ -188,12 +486,12 @@ export class Assembler {
                 let expectedNumComma: number | undefined = MapForCommaNum.getMap().get(operator);
                 let actualNumComma = this.sourceIns[i].split(",").length - 1;
                 if (expectedNumComma == undefined) {
-                    console.log("Error 11 in Assembler. Instruction unrecognized.");
+                    console.log("Error 12 in Assembler. Instruction unrecognized.");
                     return false;
                 } else if (expectedNumComma == actualNumComma) {
                     let type: string | undefined = MapForInsType.getMap().get(operator);
                     if (type == undefined) {
-                        console.log("Error 12 in Assembler. Invalid instruction type.");
+                        console.log("Error 13 in Assembler. Invalid instruction type.");
                         return false;
                     } else if (type == "P") {
                         let ins0: string = "";
@@ -268,9 +566,9 @@ export class Assembler {
                         temp.push(this.sourceIns[i]);
                     }
                 }
-            } else if (this.sourceIns[i].trim().endsWith(":")){
+            } else if (this.sourceIns[i].trim().split(":").length != 0) {
                 continue;
-                
+
             } else {
                 console.log("Error. Unrecognized instruction.");
                 return false;
@@ -295,22 +593,44 @@ export class Assembler {
         let relativeJump: number = 0;
         let patt = /^[\s]$/;
         let patt2 = /^[0-9]+$/;
+        let pattLabel = /^[A-Za-z0-9._]+$/;
+        let pattnumber = /[0-9]/;
         let labelFlag: boolean = true;
+        let posOfColon: number;
 
         for (i = 0; i < this.sourceIns.length; i++) {
             if (this.sourceIns[i] == "" || patt.test(this.sourceIns[i])) {
                 continue;
-            } else if (this.sourceIns[i].substring(this.sourceIns[i].length - 1, this.sourceIns[i].length) == ":") {
-                label = this.sourceIns[i].substring(0, this.sourceIns[i].lastIndexOf(":")).trim();
-                if (label.search(" ") != -1) {
-                    console.log("Error 9 in Assembler. Label unrecognized.");
-                    return false;
-                } else {
-                    mapForLabel.set(label, address);
-                    labelCounter = instructionCounter;
-                    mapForCounter.set(label, labelCounter.toFixed());
+            } else {
+                posOfColon = this.sourceIns[i].indexOf(":");
+                if (posOfColon != -1) {
+                    label = this.sourceIns[i].substring(0, posOfColon).trim();
+                    if (pattLabel.test(label) && pattnumber.test(label.charAt(0))) {
+                        console.log("Error 9 in Assembler. Invalid label.");
+                        return false;
+                        // } else if (this.sourceIns[i].substring(posOfColon + 1, this.sourceIns[i].length) == "" || patt.test(this.sourceIns[i].substring(posOfColon + 1, this.sourceIns[i].length))) {
+                        //     mapForLabel.set(label, address);
+                        //     labelCounter = instructionCounter;
+                        //     mapForCounter.set(label, labelCounter.toFixed());
+                    } else {
+                        mapForLabel.set(label, address);
+                        labelCounter = instructionCounter;
+                        mapForCounter.set(label, labelCounter.toFixed());
+                    }
                 }
+                address = (+address + 4).toFixed();
             }
+            //     if (this.sourceIns[i].substring(this.sourceIns[i].length - 1, this.sourceIns[i].length) == ":") {
+            //     label = this.sourceIns[i].substring(0, this.sourceIns[i].lastIndexOf(":")).trim();
+            //     if (label.search(" ") != -1) {
+            //         console.log("Error 9 in Assembler. Label unrecognized.");
+            //         return false;
+            //     } else {
+            //         mapForLabel.set(label, address);
+            //         labelCounter = instructionCounter;
+            //         mapForCounter.set(label, labelCounter.toFixed());
+            //     }
+            // }
             instructionCounter++;
         }
 
@@ -385,10 +705,18 @@ export class Assembler {
 
     public preprocess(): boolean {
         this.segmentDataText();
-        if (this.storeData()) {
-            if (this.expandPseudo()) {
-                if (this.translateLabel()) {
-                    return true;
+        if (this.formatData()) {
+            if (this.separateLabelIns()) {
+                if (this.storeData()) {
+                    if (this.expandPseudo()) {
+                        if (this.translateLabel()) {
+                            return true;
+                        } else {
+                            return false;
+                        }
+                    } else {
+                        return false;
+                    }
                 } else {
                     return false;
                 }
@@ -398,8 +726,10 @@ export class Assembler {
         } else {
             return false;
         }
+
+
     }
-    
+
     public assemble(): boolean {
         let result: boolean = true;
         let i: number;
