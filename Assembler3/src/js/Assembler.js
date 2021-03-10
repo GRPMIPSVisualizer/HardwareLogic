@@ -387,7 +387,7 @@ class Assembler {
                         return false;
                     }
                     else {
-                        this.mapForAscii.set(address, insAfterLabel.substring(posOfSpace + 2, ins.length - 1));
+                        this.mapForAscii.set(address, insAfterLabel.substring(posOfSpace + 2, insAfterLabel.length - 1));
                         if (dataIns == ".ascii") {
                             address = (+address + insAfterLabel.substring(posOfSpace + 2, ins.length - 1).length).toFixed();
                         }
@@ -497,6 +497,7 @@ class Assembler {
         }
         console.log(this.mapForDataLabel.get("item"));
         console.log(this.mapForDataLabel.get("main"));
+        console.log(this.mapForAscii.get("268500994"));
         return result;
     }
     /**
