@@ -29,6 +29,18 @@ export class Assembler {
         return this.assembler;
     }
 
+    public getMapForWord(): Map<string, number> {
+        return this.mapForWord;
+    }
+
+    public getMapForAscii(): Map<string, string> {
+        return this.mapForAscii;
+    }
+     
+    public getMapForByte(): Map<string, number> {
+        return this.mapForByte;
+    }
+
     //To be deleted
     public getSourceInsAL(): ArrayList<string> {
         return this.sourceInsAL;
@@ -368,10 +380,11 @@ export class Assembler {
                         console.log("Error 24, invalid string after .ascii.");
                         return false;
                     } else {
-                        this.mapForAscii.set(address, insAfterLabel.substring(posOfSpace + 2, insAfterLabel.length - 1));
                         if (dataIns == ".ascii") {
+                            this.mapForAscii.set(address, insAfterLabel.substring(posOfSpace + 2, insAfterLabel.length - 1));
                             address = (+address + insAfterLabel.substring(posOfSpace + 2, ins.length - 1).length).toFixed();
                         } else {
+                            this.mapForAscii.set(address, insAfterLabel.substring(posOfSpace + 2, insAfterLabel.length - 1) + "\n");
                             address = (+address + insAfterLabel.substring(posOfSpace + 2, ins.length - 1).length + 1).toFixed();
                         }
                     }
@@ -461,9 +474,6 @@ export class Assembler {
             }
 
         }
-        console.log(this.mapForDataLabel.get("item"));
-        console.log(this.mapForDataLabel.get("main"));
-        console.log(this.mapForAscii.get("268500994"));
         return result;
     }
 

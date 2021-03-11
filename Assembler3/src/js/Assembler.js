@@ -27,6 +27,15 @@ class Assembler {
     static getAssembler() {
         return this.assembler;
     }
+    getMapForWord() {
+        return this.mapForWord;
+    }
+    getMapForAscii() {
+        return this.mapForAscii;
+    }
+    getMapForByte() {
+        return this.mapForByte;
+    }
     //To be deleted
     getSourceInsAL() {
         return this.sourceInsAL;
@@ -387,11 +396,12 @@ class Assembler {
                         return false;
                     }
                     else {
-                        this.mapForAscii.set(address, insAfterLabel.substring(posOfSpace + 2, insAfterLabel.length - 1));
                         if (dataIns == ".ascii") {
+                            this.mapForAscii.set(address, insAfterLabel.substring(posOfSpace + 2, insAfterLabel.length - 1));
                             address = (+address + insAfterLabel.substring(posOfSpace + 2, ins.length - 1).length).toFixed();
                         }
                         else {
+                            this.mapForAscii.set(address, insAfterLabel.substring(posOfSpace + 2, insAfterLabel.length - 1) + "\n");
                             address = (+address + insAfterLabel.substring(posOfSpace + 2, ins.length - 1).length + 1).toFixed();
                         }
                     }
@@ -495,9 +505,6 @@ class Assembler {
                 }
             }
         }
-        console.log(this.mapForDataLabel.get("item"));
-        console.log(this.mapForDataLabel.get("main"));
-        console.log(this.mapForAscii.get("268500994"));
         return result;
     }
     /**

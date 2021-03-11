@@ -20,7 +20,9 @@ if (assembler.preprocess()) {
     }
 }
 
-
+console.log(assembler.getMapForAscii().get("268500994"));
+console.log(assembler.getMapForByte().get("268500992"));
+console.log(assembler.getMapForByte().get("268500993"));
 
 let printer: Array<string> = new Array<string>(10);
 let i: number;

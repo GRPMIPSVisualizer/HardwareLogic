@@ -20,6 +20,9 @@ if (assembler.preprocess()) {
         }
     }
 }
+console.log(assembler.getMapForAscii().get("268500994"));
+console.log(assembler.getMapForByte().get("268500992"));
+console.log(assembler.getMapForByte().get("268500993"));
 let printer = new Array(10);
 let i;
 printer = assembler.getSourceIns();
