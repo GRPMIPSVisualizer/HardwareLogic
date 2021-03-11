@@ -9,7 +9,9 @@ import {DecoderForR} from "./DecoderForR";
 import {DecoderForI} from "./DecoderForI";
 import {DecoderForJ} from "./DecoderForJ";
 import {MapForInsType} from "./MapForInsType";
-import {trimSpace} from "./TrimSpace";
+import { trimSpace } from "./TrimSpace";
+import { binaryToDecimal } from "./BinaryToDecimal";
+
 var list = new ArrayList(10);
 list.add("张三");
 list.add("李四");
@@ -340,3 +342,6 @@ console.log(strArr);
 console.log("-------------------------");
 str = "main: ";
 console.log(str.trim().endsWith(":"));
+
+console.log("-------------------------");
+console.log(binaryToDecimal("0000000000000010"));

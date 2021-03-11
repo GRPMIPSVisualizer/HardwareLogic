@@ -5,6 +5,8 @@ import { MapForCommaNum } from "./MapForCommaNum";
 import { MapForInsType } from "./MapForInsType";
 import { ArrayList } from "./ArrayList";
 import { trimSpace } from "./TrimSpace";
+import { decimalToBinary } from "./DecimalToBinary";
+import { binaryToDecimal } from "./BinaryToDecimal";
 
 export class Assembler {
 
@@ -33,10 +35,14 @@ export class Assembler {
         return this.mapForWord;
     }
 
+    public getMapForDataLabel(): Map<string, string> {
+        return this.mapForDataLabel;
+    }
+
     public getMapForAscii(): Map<string, string> {
         return this.mapForAscii;
     }
-     
+
     public getMapForByte(): Map<string, number> {
         return this.mapForByte;
     }
@@ -320,7 +326,12 @@ export class Assembler {
                                 console.log("Error 19, .word value out of range.");
                                 return false;
                             } else {
-                                this.mapForWord.set(address, +wordArray[j]);
+                                if (+address % 4 == 0) {
+                                    this.mapForWord.set(address, +wordArray[j]);
+                                } else {
+                                    address = (+address + +address % 4).toFixed();
+                                    this.mapForWord.set(address, +wordArray[j]);
+                                }
                                 address = (+address + 4).toFixed();
                             }
                         }
@@ -337,7 +348,12 @@ export class Assembler {
                                 console.log("Error 17, .word value out of range.");
                                 return false;
                             } else {
-                                this.mapForWord.set(address, wordNumber);
+                                if (+address % 4 == 0) {
+                                    this.mapForWord.set(address, wordNumber);
+                                } else {
+                                    address = (+address + +address % 4).toFixed();
+                                    this.mapForWord.set(address, wordNumber);
+                                }
                                 address = (+address + 4).toFixed();
                             }
                         }
@@ -403,7 +419,12 @@ export class Assembler {
                                 console.log("Error 19, .word value out of range.");
                                 return false;
                             } else {
-                                this.mapForWord.set(address, +wordArray[j]);
+                                if (+address % 4 == 0) {
+                                    this.mapForWord.set(address, +wordArray[j]);
+                                } else {
+                                    address = (+address + +address % 4).toFixed();
+                                    this.mapForWord.set(address, +wordArray[j]);
+                                }
                                 address = (+address + 4).toFixed();
                             }
                         }
@@ -420,7 +441,12 @@ export class Assembler {
                                 console.log("Error 17, .word value out of range.");
                                 return false;
                             } else {
-                                this.mapForWord.set(address, wordNumber);
+                                if (+address % 4 == 0) {
+                                    this.mapForWord.set(address, wordNumber);
+                                } else {
+                                    address = (+address + +address % 4).toFixed();
+                                    this.mapForWord.set(address, wordNumber);
+                                }
                                 address = (+address + 4).toFixed();
                             }
                         }
@@ -473,6 +499,28 @@ export class Assembler {
                 }
             }
 
+        }
+        return result;
+    }
+
+    public checkLabel(): boolean {
+        let result: boolean = true;
+        let i: number;
+        let posOfColon: number;
+        let mapForAllLabel: Map<string, string> = new Map();
+        for (i = 0; i < this.sources.length; i++) {
+            posOfColon = this.sources[i].indexOf(":");
+            if (posOfColon != -1) {
+                let label = this.sources[i].substring(0, posOfColon);
+                if (mapForAllLabel.has(label)) {
+                    console.log("Error 101. Label has already existed.");
+                    return false;
+                } else {
+                    mapForAllLabel.set(label, "");
+                }
+            } else {
+                continue;
+            }
         }
         return result;
     }
@@ -550,10 +598,18 @@ export class Assembler {
                         } else if (operator == "li") {
                             ins0 = "addiu " + operand0 + ",$0," + operand1;
                         } else if (operator == "la") {
-                            //la $reg, label
-                            //->
-                            //lui $1, first 16 bits of label
-                            //ori $reg, $1, last 16 bits of label　　　
+                            if (this.mapForDataLabel.has(operand1)) {
+                                let address: string = decimalToBinary(+(this.mapForDataLabel.get(operand1) + ""), 32);
+                                let first16bits = binaryToDecimal(address.substring(0, 16));
+                                let last16bits = binaryToDecimal(address.substring(16));
+                                ins0 = "lui $1," + first16bits;
+                                ins1 = "ori " + operand0 + ",$1," + last16bits;
+                                console.log(address);
+                            }
+                            else {
+                                console.log("Error100: Label unrecognized.");
+                                return false;
+                            }
                         } else if (operator == "move") {
                             ins0 = "addu " + operand0 + ",$0," + operand1;
                         } else if (operator == "sge") {
@@ -585,6 +641,7 @@ export class Assembler {
                 return false;
             }
         }
+        this.sourceIns = temp;
         return result;
     }
 
@@ -716,12 +773,16 @@ export class Assembler {
 
     public preprocess(): boolean {
         this.segmentDataText();
-        if (this.formatData()) {
-            if (this.separateLabelIns()) {
-                if (this.storeData()) {
-                    if (this.expandPseudo()) {
-                        if (this.translateLabel()) {
-                            return true;
+        if (this.checkLabel()) {
+            if (this.formatData()) {
+                if (this.separateLabelIns()) {
+                    if (this.storeData()) {
+                        if (this.expandPseudo()) {
+                            if (this.translateLabel()) {
+                                return true;
+                            } else {
+                                return false;
+                            }
                         } else {
                             return false;
                         }
@@ -737,8 +798,6 @@ export class Assembler {
         } else {
             return false;
         }
-
-
     }
 
     public assemble(): boolean {

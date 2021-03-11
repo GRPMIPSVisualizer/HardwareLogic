@@ -8,6 +8,8 @@ const MapForCommaNum_1 = require("./MapForCommaNum");
 const MapForInsType_1 = require("./MapForInsType");
 const ArrayList_1 = require("./ArrayList");
 const TrimSpace_1 = require("./TrimSpace");
+const DecimalToBinary_1 = require("./DecimalToBinary");
+const BinaryToDecimal_1 = require("./BinaryToDecimal");
 class Assembler {
     constructor() {
         this.decoderForR = DecoderForR_1.DecoderForR.getDecoder();
@@ -29,6 +31,9 @@ class Assembler {
     }
     getMapForWord() {
         return this.mapForWord;
+    }
+    getMapForDataLabel() {
+        return this.mapForDataLabel;
     }
     getMapForAscii() {
         return this.mapForAscii;
@@ -325,7 +330,13 @@ class Assembler {
                                 return false;
                             }
                             else {
-                                this.mapForWord.set(address, +wordArray[j]);
+                                if (+address % 4 == 0) {
+                                    this.mapForWord.set(address, +wordArray[j]);
+                                }
+                                else {
+                                    address = (+address + +address % 4).toFixed();
+                                    this.mapForWord.set(address, +wordArray[j]);
+                                }
                                 address = (+address + 4).toFixed();
                             }
                         }
@@ -345,7 +356,13 @@ class Assembler {
                                 return false;
                             }
                             else {
-                                this.mapForWord.set(address, wordNumber);
+                                if (+address % 4 == 0) {
+                                    this.mapForWord.set(address, wordNumber);
+                                }
+                                else {
+                                    address = (+address + +address % 4).toFixed();
+                                    this.mapForWord.set(address, wordNumber);
+                                }
                                 address = (+address + 4).toFixed();
                             }
                         }
@@ -423,7 +440,13 @@ class Assembler {
                                 return false;
                             }
                             else {
-                                this.mapForWord.set(address, +wordArray[j]);
+                                if (+address % 4 == 0) {
+                                    this.mapForWord.set(address, +wordArray[j]);
+                                }
+                                else {
+                                    address = (+address + +address % 4).toFixed();
+                                    this.mapForWord.set(address, +wordArray[j]);
+                                }
                                 address = (+address + 4).toFixed();
                             }
                         }
@@ -443,7 +466,13 @@ class Assembler {
                                 return false;
                             }
                             else {
-                                this.mapForWord.set(address, wordNumber);
+                                if (+address % 4 == 0) {
+                                    this.mapForWord.set(address, wordNumber);
+                                }
+                                else {
+                                    address = (+address + +address % 4).toFixed();
+                                    this.mapForWord.set(address, wordNumber);
+                                }
                                 address = (+address + 4).toFixed();
                             }
                         }
@@ -503,6 +532,29 @@ class Assembler {
                         }
                     }
                 }
+            }
+        }
+        return result;
+    }
+    checkLabel() {
+        let result = true;
+        let i;
+        let posOfColon;
+        let mapForAllLabel = new Map();
+        for (i = 0; i < this.sources.length; i++) {
+            posOfColon = this.sources[i].indexOf(":");
+            if (posOfColon != -1) {
+                let label = this.sources[i].substring(0, posOfColon);
+                if (mapForAllLabel.has(label)) {
+                    console.log("Error 101. Label has already existed.");
+                    return false;
+                }
+                else {
+                    mapForAllLabel.set(label, "");
+                }
+            }
+            else {
+                continue;
             }
         }
         return result;
@@ -588,10 +640,18 @@ class Assembler {
                             ins0 = "addiu " + operand0 + ",$0," + operand1;
                         }
                         else if (operator == "la") {
-                            //la $reg, label
-                            //->
-                            //lui $1, first 16 bits of label
-                            //ori $reg, $1, last 16 bits of label　　　
+                            if (this.mapForDataLabel.has(operand1)) {
+                                let address = DecimalToBinary_1.decimalToBinary(+(this.mapForDataLabel.get(operand1) + ""), 32);
+                                let first16bits = BinaryToDecimal_1.binaryToDecimal(address.substring(0, 16));
+                                let last16bits = BinaryToDecimal_1.binaryToDecimal(address.substring(16));
+                                ins0 = "lui $1," + first16bits;
+                                ins1 = "ori " + operand0 + ",$1," + last16bits;
+                                console.log(address);
+                            }
+                            else {
+                                console.log("Error100: Label unrecognized.");
+                                return false;
+                            }
                         }
                         else if (operator == "move") {
                             ins0 = "addu " + operand0 + ",$0," + operand1;
@@ -627,6 +687,7 @@ class Assembler {
                 return false;
             }
         }
+        this.sourceIns = temp;
         return result;
     }
     translateLabel() {
@@ -766,12 +827,17 @@ class Assembler {
     }
     preprocess() {
         this.segmentDataText();
-        if (this.formatData()) {
-            if (this.separateLabelIns()) {
-                if (this.storeData()) {
-                    if (this.expandPseudo()) {
-                        if (this.translateLabel()) {
-                            return true;
+        if (this.checkLabel()) {
+            if (this.formatData()) {
+                if (this.separateLabelIns()) {
+                    if (this.storeData()) {
+                        if (this.expandPseudo()) {
+                            if (this.translateLabel()) {
+                                return true;
+                            }
+                            else {
+                                return false;
+                            }
                         }
                         else {
                             return false;
