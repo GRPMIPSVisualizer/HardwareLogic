@@ -10,10 +10,11 @@ class InstructionJ extends Instruction_1.Instruction {
     //The address should be represented by a decimal number.
     constructor(ins) {
         super(ins);
+        this.errMsg = "";
         let opBin = MapForJ_1.MapForJ.getMap().get(this.operator);
         if (opBin == undefined) {
             this.op = "XXXXXX";
-            console.log("Error in constructor for InstructionR.");
+            this.errMsg = this.errMsg + "Error 102: Failed to construct type-J instruction. -- " + ins + "\n";
         }
         else {
             this.op = opBin;
@@ -22,6 +23,9 @@ class InstructionJ extends Instruction_1.Instruction {
         this.operandADDRESS = ins.substring(posOfSpace + 1, ins.length);
         this.address = DecimalToBinary_1.decimalToBinary(+this.operandADDRESS, 26);
         this.binIns = this.op + this.address;
+    }
+    getErrMsg() {
+        return this.errMsg;
     }
 }
 exports.InstructionJ = InstructionJ;

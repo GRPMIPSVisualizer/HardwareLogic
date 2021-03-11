@@ -7,7 +7,8 @@ import { ArrayList } from "./ArrayList";
 import { Assembler } from "./Assembler";
 import { InstructionI } from "./InstructionI";
 let assembler: Assembler = Assembler.getAssembler();
-assembler.setSources(".data" + "\n" + "item:" + "\n" + ".ascii \"s\"" + "\n" + ".word 33" + "\n" + "item:" + "\n" + ".asciiz" + "\n" + "\"scc\"" + "\n" + ".text" + "\n" + "la $t1,item");
+assembler.setSources(".data" + "\n" + ".ascii" + "\n" + "\"s\"" + "\n" + ".text" + "\n" + "main: " + "\n" + "add $s1,$s2,$s3" + "\n" + "beq $s1,$s2,main");
+//assembler.setSources(".data" + "\n" + "item:" + "\n" + ".ascii \"s\"" + "\n" + ".word 33" + "\n" + "item2:" + "\n" + ".asciiz" + "\n" + "\"scc\"" + "\n" + ".text" + "\n" + "la $t1,item");
 //assembler.setSources("sub $s1, $s2, $s3" + "\n" + ".text" + "\n" + ".globl main" + "\n" + "addi $s1,$s2,100" + "\n" + ".text" + "\n" + "addi $s1,$s2,10" + "\n" + ".data" + "\n" + ".asciiz  10000" + "\n" + ".data" + "\n" + ".byte 7890" + "\n" + ".text" + "\n" + "beq $t1,$t2,main" + "\n" + "main:" + "addi $s1,$s2,10" + "\n" + "j main" + "\n" + "beq $t1,$t2,-1");
 if (assembler.preprocess()) {
     if (assembler.assemble()) {
@@ -17,25 +18,30 @@ if (assembler.preprocess()) {
         for (i = 0; i < bin.size(); i++) {
             console.log(bin.get(i).toString());
         }
+    } else {
+        console.log(assembler.getErrMsg());
     }
+} else {
+    console.log(assembler.getErrMsg());
 }
-console.log(assembler.getMapForDataLabel().keys());
-console.log(assembler.getMapForDataLabel().values());
+// console.log(assembler.getMapForDataLabel().keys());
+// console.log(assembler.getMapForDataLabel().values());
 
 let printer: Array<string> = new Array<string>(10);
 let i: number;
+console.log("SourceIns-----------------------");
 printer = assembler.getSourceIns();
 for (i = 0; i < printer.length; i++) {
     console.log(printer[i]);
 }
 
-console.log("-----------------------");
+console.log("Basic-----------------------");
 let printer3 = assembler.getBasic();
 for (i = 0; i < printer3.size(); i++) {
     console.log(printer3.get(i));
 }
 
-console.log("-----------------------");
+console.log("Data-----------------------");
 let printer2: ArrayList<string> = new ArrayList<string>(10);
 printer2 = assembler.getData();
 for (i = 0; i < printer2.size(); i++) {

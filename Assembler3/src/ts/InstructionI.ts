@@ -11,6 +11,7 @@ export class InstructionI extends Instruction{
     private rs: string;
     private rt: string;
     private imm: string;
+    private errMsg: string = "";
 
     //The ins should be in the form like "addi $8,$16,10".
     //There should be only one space between the operator and the first operand, no other space existing.
@@ -20,7 +21,7 @@ export class InstructionI extends Instruction{
         let opBin: string | undefined = MapForI.getMap().get(this.operator);
         if (opBin == undefined) {
             this.op = "XXXXXX";
-            console.log("Error in constructor for InstructionR.");
+            this.errMsg = this.errMsg + "Error 101: Failed to construct type-I instruction. -- " + ins + "\n";
         } else {
             this.op = opBin;
         }
@@ -67,5 +68,9 @@ export class InstructionI extends Instruction{
             this.imm = decimalToBinary(+this.operandIMM, 16);
         }
         this.binIns = this.op + this.rs + this.rt + this.imm;
+    }
+
+    public getErrMsg(): string {
+        return this.errMsg;
     }
 }

@@ -10,11 +10,12 @@ class InstructionR extends Instruction_1.Instruction {
     //The register should be in dollar sign and a number.
     constructor(ins) {
         super(ins);
+        this.errMsg = "";
         this.op = "000000";
         let functBin = MapForR_1.MapForR.getMap().get(this.operator);
         if (functBin == undefined) {
             this.funct = "XXXXXX";
-            console.log("Error in constructor for InstructionR.");
+            this.errMsg = this.errMsg + "Error 103: Failed to construct type-R instruction. -- " + ins + "\n";
         }
         else {
             this.funct = functBin;
@@ -50,6 +51,9 @@ class InstructionR extends Instruction_1.Instruction {
             this.shamt = "00000";
         }
         this.binIns = this.op + this.rs + this.rt + this.rd + this.shamt + this.funct;
+    }
+    getErrMsg() {
+        return this.errMsg;
     }
 }
 exports.InstructionR = InstructionR;

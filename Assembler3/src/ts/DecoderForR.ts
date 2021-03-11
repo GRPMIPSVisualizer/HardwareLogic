@@ -3,7 +3,7 @@ import {InstructionR} from "./InstructionR";
 import {MapForRegister} from "./MapForRegister";
 
 export class DecoderForR extends Decoder {
-
+    private errMsg: string = "";
     private static decoder: DecoderForR = new DecoderForR();
 
     private constructor(){
@@ -36,9 +36,10 @@ export class DecoderForR extends Decoder {
 
         let patt1 = /^[0-9]+$/;
         let patt2 = /^[a-z0-9]+$/;
+        let patt3 = /^(\+)?\d+$/;
 
-        if((!(SHAMT == "" || patt1.test(SHAMT))) || (patt1.test(SHAMT) && +SHAMT >= 32)) {
-            console.log("Error 1 in DecoderForR. Invalid shift amount.");
+        if ((!(SHAMT == "" || patt3.test(SHAMT))) || (patt3.test(SHAMT) && +SHAMT >= 32)) {
+            this.errMsg = this.errMsg + "Error 209: Invalid shift amount. -- " + this.getIns() + "\n";
             return false;
         }
  
@@ -47,7 +48,7 @@ export class DecoderForR extends Decoder {
         for (i = 0; i < operands.length; i++) {
             let operand: string = operands[i].substring(1,operands[i].length);
             if (operands[i].charAt(0) == "$" && patt1.test(operand) && +operand > 31) {
-                console.log("Error 2 in DecoderForR. Invalid operand.");
+                this.errMsg = this.errMsg + "Error 210: Invalid operand. -- " + this.getIns() + "\n";
                 return false;
             } else if (operands[i] == "" || (operands[i].charAt(0) == "$" && patt1.test(operand) && +operand <= 31)) {
                 break;
@@ -55,23 +56,29 @@ export class DecoderForR extends Decoder {
                 if (MapForRegister.getMap().has(operand)) {
                     let operandID: string | undefined = MapForRegister.getMap().get(operand);
                     if (operandID == undefined) {
-                        console.log("Error 3 in DecoderForR. Invalid operand.");
+                        this.errMsg = this.errMsg + "Error 211: Invalid operand. -- " + this.getIns() + "\n";
                         return false;
                     } else {
                         this.ins = this.ins.replace(operand, operandID);
                     }
+                } else {
+                    this.errMsg = this.errMsg + "Error 212: Invalid operand. -- " + this.getIns() + "\n";
+                    return false;
                 }
             } else {
-                console.log("Error 4 in DecoderForR. Invalid operand.");
+                this.errMsg = this.errMsg + "Error 213: Invalid operand. -- " + this.getIns() + "\n";
                 return false;
             }
         }
-        
         return true;
     }
 
     public decode(): void {
         let instruction: InstructionR = new InstructionR(this.ins);
         this.binIns = instruction.getBinIns();
+    }
+
+    public getErrMsg(): string {
+        return this.errMsg;
     }
 }

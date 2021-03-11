@@ -24,11 +24,16 @@ export class Assembler {
     private mapForWord: Map<string, number> = new Map();
     private mapForAscii: Map<string, string> = new Map();
     private mapForByte: Map<string, number> = new Map();
+    private errMsg: string = "";
 
     private constructor() { }
 
     public static getAssembler(): Assembler {
         return this.assembler;
+    }
+
+    public getErrMsg(): string {
+        return this.errMsg;
     }
 
     public getMapForWord(): Map<string, number> {
@@ -181,7 +186,6 @@ export class Assembler {
     public separateLabelIns(): boolean {
         let result: boolean = true;
         let posOfColon: number;
-        let patt = /^[\s]$/;
         let pattLabel = /^[A-Za-z0-9._]+$/;
         let pattnumber = /[0-9]/;
         let i: number;
@@ -191,10 +195,12 @@ export class Assembler {
             if (posOfColon != -1) {
                 label = this.sourceIns[i].substring(0, posOfColon).trim();
                 if (pattLabel.test(label) && pattnumber.test(label.charAt(0))) {
-                    console.log("Error 14 in Assembler. Invalid label.");
+                    this.errMsg = this.errMsg + "Error 303: Invalid label. -- " + this.sourceIns[i] + "\n";
                     return false;
-                } else if (this.sourceIns[i].substring(posOfColon + 1, this.sourceIns[i].length) == "" || !patt.test(this.sourceIns[i].substring(posOfColon + 1, this.sourceIns[i].length))) {
+                } else if (this.sourceIns[i].substring(posOfColon + 1, this.sourceIns[i].length) != "") {
+                    console.log(this.sourceIns);
                     this.sourceIns.splice(i, 1, label + ":", this.sourceIns[i].substring(posOfColon + 1, this.sourceIns[i].length));
+                    console.log(this.sourceIns);
                 }
             }
         }
@@ -216,7 +222,7 @@ export class Assembler {
             if (posOfColon != -1) {
                 label = this.data.get(i).toString().substring(0, posOfColon);
                 if (pattLabel.test(label) && pattnumber.test(label.charAt(0))) {
-                    console.log("Error 15 in Assembler. Invalid label.");
+                    this.errMsg = this.errMsg + "Error 302: Invalid label. -- " + this.data.get(i) + "\n";
                     return false;
                 }
                 if (this.data.get(i).toString().substring(posOfColon + 1, this.data.get(i).toString.length) == "" || !patt.test(this.data.get(i).toString().substring(posOfColon + 1, this.data.get(i).toString.length))) {
@@ -275,13 +281,16 @@ export class Assembler {
                     } else {
                         continue;
                     }
+                } else {
+                    this.errMsg = this.errMsg + "Error 336: Invalid instruction. -- " + this.data.get(i) + "\n";
+                    return false;
                 }
-                posOfQuo = this.data.get(i).toString().indexOf("\"");
-                if (posOfQuo != -1) {
-                    resultData.add(this.data.get(i).toString().substring(0, posOfQuo).trim() + " " + this.data.get(i).toString().substring(posOfQuo, this.data.get(i).toString().length).trim());
-                    continue;
-                }
-                resultData.add(this.data.get(i).toString().trim());
+                // posOfQuo = this.data.get(i).toString().indexOf("\"");
+                // if (posOfQuo != -1) {
+                //     resultData.add(this.data.get(i).toString().substring(0, posOfQuo).trim() + " " + this.data.get(i).toString().substring(posOfQuo, this.data.get(i).toString().length).trim());
+                //     continue;
+                // }
+                // resultData.add(this.data.get(i).toString().trim());
             }
         }
 
@@ -305,7 +314,7 @@ export class Assembler {
         let address: string = "268500992";
         let posOfSpace: number;
         let dataIns: string;
-        let patt = /[0-9]/;
+        let patt = /^(\-|\+)?\d+$/;
         for (i = 0; i < this.data.size(); i++) {
             let ins: string = this.data.get(i).toString();
             let posOfColon: number = ins.indexOf(":");
@@ -320,10 +329,10 @@ export class Assembler {
                         let wordArray = insAfterLabel.substring(posOfSpace, ins.length).trim().split(",");
                         for (j = 0; j < wordArray.length; j++) {
                             if (!patt.test(wordArray[j])) {
-                                console.log("Error 18, Invalid instruction after .word.");
+                                this.errMsg = this.errMsg + "Error 304: Invalid data type. -- " + this.data.get(i) + "\n";
                                 return false;
                             } else if (+wordArray[j] > 2147483647 || +wordArray[j] < -2147483648) {
-                                console.log("Error 19, .word value out of range.");
+                                this.errMsg = this.errMsg + "Error 305: Data value out of range. -- " + this.data.get(i) + "\n";
                                 return false;
                             } else {
                                 if (+address % 4 == 0) {
@@ -340,12 +349,12 @@ export class Assembler {
                             continue;
                         }
                         if (patt.test(insAfterLabel.substring(posOfSpace, ins.length).trim())) {
-                            console.log("Error 16, Invalid instruction after .word.");
+                            this.errMsg = this.errMsg + "Error 306: Invalid data type. -- " + this.data.get(i) + "\n";
                             return false;
                         } else {
                             let wordNumber: number = +ins.substring(posOfSpace, ins.length).trim();
                             if (wordNumber > 2147483647 || wordNumber < -2147483648) {
-                                console.log("Error 17, .word value out of range.");
+                                this.errMsg = this.errMsg + "Error 307: Data value out of range. -- " + this.data.get(i) + "\n";
                                 return false;
                             } else {
                                 if (+address % 4 == 0) {
@@ -363,10 +372,10 @@ export class Assembler {
                         let byteArray = insAfterLabel.substring(posOfSpace, ins.length).trim().split(",");
                         for (j = 0; j < byteArray.length; j++) {
                             if (!patt.test(byteArray[j])) {
-                                console.log("Error 20, Invalid instruction after .byte.");
+                                this.errMsg = this.errMsg + "Error 308: Invalid data type. -- " + this.data.get(i) + "\n";
                                 return false;
                             } else if (+byteArray[j] > 127 || +byteArray[j] < -128) {
-                                console.log("Error 21, .byte value out of range.");
+                                this.errMsg = this.errMsg + "Error 309: Data value out of range. -- " + this.data.get(i) + "\n";
                                 return false;
                             } else {
                                 this.mapForByte.set(address, +byteArray[j]);
@@ -378,12 +387,12 @@ export class Assembler {
                             continue;
                         }
                         if (!patt.test(ins.substring(posOfSpace, ins.length).trim())) {
-                            console.log("Error 22, Invalid instruction after .word.");
+                            this.errMsg = this.errMsg + "Error 310: Invalid data type. -- " + this.data.get(i) + "\n";
                             return false;
                         } else {
                             let byteNumber: number = +insAfterLabel.substring(posOfSpace, ins.length).trim();
                             if (byteNumber > 127 || byteNumber < -128) {
-                                console.log("Error 23, .byte value out of range.");
+                                this.errMsg = this.errMsg + "Error 311: Data value out of range. -- " + this.data.get(i) + "\n";
                                 return false;
                             } else {
                                 this.mapForWord.set(address, byteNumber);
@@ -393,7 +402,7 @@ export class Assembler {
                     }
                 } else if (dataIns == ".ascii" || dataIns == ".asciiz") {
                     if (insAfterLabel.substring(posOfSpace, ins.length).trim().charAt(0) != "\"" || !insAfterLabel.substring(posOfSpace, ins.length).trim().endsWith("\"")) {
-                        console.log("Error 24, invalid string after .ascii.");
+                        this.errMsg = this.errMsg + "Error 312: Invalid string. -- " + this.data.get(i) + "\n";
                         return false;
                     } else {
                         if (dataIns == ".ascii") {
@@ -413,10 +422,10 @@ export class Assembler {
                         let wordArray = ins.substring(posOfSpace, ins.length).trim().split(",");
                         for (j = 0; j < wordArray.length; j++) {
                             if (!patt.test(wordArray[j])) {
-                                console.log("Error 18, Invalid instruction after .word.");
+                                this.errMsg = this.errMsg + "Error 313: Invalid data type. -- " + this.data.get(i) + "\n";
                                 return false;
                             } else if (+wordArray[j] > 2147483647 || +wordArray[j] < -2147483648) {
-                                console.log("Error 19, .word value out of range.");
+                                this.errMsg = this.errMsg + "Error 314: Data value out of range. -- " + this.data.get(i) + "\n";
                                 return false;
                             } else {
                                 if (+address % 4 == 0) {
@@ -433,12 +442,12 @@ export class Assembler {
                             continue;
                         }
                         if (!patt.test(ins.substring(posOfSpace, ins.length).trim())) {
-                            console.log("Error 16, Invalid instruction after .word.");
+                            this.errMsg = this.errMsg + "Error 315: Invalid data type. -- " + this.data.get(i) + "\n";
                             return false;
                         } else {
                             let wordNumber: number = +ins.substring(posOfSpace, ins.length).trim();
                             if (wordNumber > 2147483647 || wordNumber < -2147483648) {
-                                console.log("Error 17, .word value out of range.");
+                                this.errMsg = this.errMsg + "Error 316: Data value out of range. -- " + this.data.get(i) + "\n";
                                 return false;
                             } else {
                                 if (+address % 4 == 0) {
@@ -456,10 +465,10 @@ export class Assembler {
                         let byteArray = ins.substring(posOfSpace, ins.length).trim().split(",");
                         for (j = 0; j < byteArray.length; j++) {
                             if (!patt.test(byteArray[j])) {
-                                console.log("Error 20, Invalid instruction after .byte.");
+                                this.errMsg = this.errMsg + "Error 317: Invalid data type. -- " + this.data.get(i) + "\n";
                                 return false;
                             } else if (+byteArray[j] > 127 || +byteArray[j] < -128) {
-                                console.log("Error 21, .byte value out of range.");
+                                this.errMsg = this.errMsg + "Error 318: Data value out of range. -- " + this.data.get(i) + "\n";
                                 return false;
                             } else {
                                 this.mapForByte.set(address, +byteArray[j]);
@@ -471,12 +480,12 @@ export class Assembler {
                             continue;
                         }
                         if (!patt.test(ins.substring(posOfSpace, ins.length).trim())) {
-                            console.log("Error 22, Invalid instruction after .word.");
+                            this.errMsg = this.errMsg + "Error 319: Invalid data type. -- " + this.data.get(i) + "\n";
                             return false;
                         } else {
                             let byteNumber: number = +ins.substring(posOfSpace, ins.length).trim();
                             if (byteNumber > 127 || byteNumber < -128) {
-                                console.log("Error 23, .byte value out of range.");
+                                this.errMsg = this.errMsg + "Error 320: Data value out of range. -- " + this.data.get(i) + "\n";
                                 return false;
                             } else {
                                 this.mapForWord.set(address, byteNumber);
@@ -486,7 +495,7 @@ export class Assembler {
                     }
                 } else if (dataIns == ".ascii" || dataIns == ".asciiz") {
                     if (ins.substring(posOfSpace, ins.length).trim().charAt(0) != "\"" || !ins.substring(posOfSpace, ins.length).trim().endsWith("\"")) {
-                        console.log("Error 24, invalid string after .ascii.");
+                        this.errMsg = this.errMsg + "Error 321: Invalid string. -- " + this.data.get(i) + "\n";
                         return false;
                     } else {
                         this.mapForAscii.set(address, ins.substring(posOfSpace + 2, ins.length - 1));
@@ -513,7 +522,7 @@ export class Assembler {
             if (posOfColon != -1) {
                 let label = this.sources[i].substring(0, posOfColon);
                 if (mapForAllLabel.has(label)) {
-                    console.log("Error 101. Label has already existed.");
+                    this.errMsg = this.errMsg + "Error 301: Label has already existed. -- " + this.sources[i] + "\n";
                     return false;
                 } else {
                     mapForAllLabel.set(label, "");
@@ -545,12 +554,12 @@ export class Assembler {
                 let expectedNumComma: number | undefined = MapForCommaNum.getMap().get(operator);
                 let actualNumComma = this.sourceIns[i].split(",").length - 1;
                 if (expectedNumComma == undefined) {
-                    console.log("Error 12 in Assembler. Instruction unrecognized.");
+                    this.errMsg = this.errMsg + "Error 322: Invalid instruction. -- " + this.sourceIns[i] + "\n";
                     return false;
                 } else if (expectedNumComma == actualNumComma) {
                     let type: string | undefined = MapForInsType.getMap().get(operator);
                     if (type == undefined) {
-                        console.log("Error 13 in Assembler. Invalid instruction type.");
+                        this.errMsg = this.errMsg + "Error 323: Invalid instruction. -- " + this.sourceIns[i] + "\n";
                         return false;
                     } else if (type == "P") {
                         let ins0: string = "";
@@ -607,7 +616,7 @@ export class Assembler {
                                 console.log(address);
                             }
                             else {
-                                console.log("Error100: Label unrecognized.");
+                                this.errMsg = this.errMsg + "Error 324: Label unrecongnized. -- " + this.sourceIns[i] + "\n";
                                 return false;
                             }
                         } else if (operator == "move") {
@@ -632,12 +641,14 @@ export class Assembler {
                     } else {
                         temp.push(this.sourceIns[i]);
                     }
+                } else {
+                    this.errMsg = this.errMsg + "Error 325: Too few or incorrectly formatted operands. -- " + this.sourceIns[i] + "\n";
+                    return false;
                 }
             } else if (this.sourceIns[i].trim().split(":").length != 0) {
-                continue;
-
+                temp.push(this.sourceIns[i]);
             } else {
-                console.log("Error. Unrecognized instruction.");
+                this.errMsg = this.errMsg + "Error 326: Instruction unrecognized. -- " + this.sourceIns[i] + "\n";
                 return false;
             }
         }
@@ -660,10 +671,8 @@ export class Assembler {
         let mapForCounter: Map<string, string> = new Map();
         let relativeJump: number = 0;
         let patt = /^[\s]$/;
-        let patt2 = /^[0-9]+$/;
         let pattLabel = /^[A-Za-z0-9._]+$/;
         let pattnumber = /[0-9]/;
-        let labelFlag: boolean = true;
         let posOfColon: number;
 
         for (i = 0; i < this.sourceIns.length; i++) {
@@ -673,32 +682,22 @@ export class Assembler {
                 posOfColon = this.sourceIns[i].indexOf(":");
                 if (posOfColon != -1) {
                     label = this.sourceIns[i].substring(0, posOfColon).trim();
-                    if (pattLabel.test(label) && pattnumber.test(label.charAt(0))) {
-                        console.log("Error 9 in Assembler. Invalid label.");
-                        return false;
-                        // } else if (this.sourceIns[i].substring(posOfColon + 1, this.sourceIns[i].length) == "" || patt.test(this.sourceIns[i].substring(posOfColon + 1, this.sourceIns[i].length))) {
-                        //     mapForLabel.set(label, address);
-                        //     labelCounter = instructionCounter;
-                        //     mapForCounter.set(label, labelCounter.toFixed());
+                    if (pattLabel.test(label)) {
+                        if (pattnumber.test(label.charAt(0))) {
+                            this.errMsg = this.errMsg + "Error 327: Invalid label. -- " + this.sourceIns[i] + "\n";
+                            return false;
+                        } else {
+                            mapForLabel.set(label, address);
+                            labelCounter = instructionCounter;
+                            mapForCounter.set(label, labelCounter.toFixed());
+                        }
                     } else {
-                        mapForLabel.set(label, address);
-                        labelCounter = instructionCounter;
-                        mapForCounter.set(label, labelCounter.toFixed());
+                        this.errMsg = this.errMsg + "Error 328: Invalid label. -- " + this.sourceIns[i] + "\n";
+                        return false;
                     }
                 }
                 address = (+address + 4).toFixed();
             }
-            //     if (this.sourceIns[i].substring(this.sourceIns[i].length - 1, this.sourceIns[i].length) == ":") {
-            //     label = this.sourceIns[i].substring(0, this.sourceIns[i].lastIndexOf(":")).trim();
-            //     if (label.search(" ") != -1) {
-            //         console.log("Error 9 in Assembler. Label unrecognized.");
-            //         return false;
-            //     } else {
-            //         mapForLabel.set(label, address);
-            //         labelCounter = instructionCounter;
-            //         mapForCounter.set(label, labelCounter.toFixed());
-            //     }
-            // }
             instructionCounter++;
         }
 
@@ -711,57 +710,28 @@ export class Assembler {
                 operator = this.sourceIns[i].substring(0, posOfSpace);
                 if (operator == "j" || operator == "jal") {
                     jumpLabel = this.sourceIns[i].substring(posOfSpace, this.sourceIns[i].length).trim();
-                    for (j = 0; j < jumpLabel.length; j++) {
-                        if (!patt2.test(jumpLabel.charAt(j))) {
-                            labelFlag = true;
-                            break;
+                    if (mapForLabel.has(jumpLabel)) {
+                        if (operator == "j") {
+                            this.sourceIns[i] = "j " + mapForLabel.get(jumpLabel);
                         } else {
-                            labelFlag = false;
-                        }
-                    }
-                    if (labelFlag) {
-                        if (mapForLabel.has(jumpLabel)) {
-                            if (operator == "j") {
-                                this.sourceIns[i] = "j " + mapForLabel.get(jumpLabel);
-                            } else {
-                                this.sourceIns[i] = "jal " + mapForLabel.get(jumpLabel);
-                            }
-                            address = (+address + 4).toFixed();
-                        } else {
-                            console.log("Error 10 in Assembler. Label is not found.");
-                            return false;
+                            this.sourceIns[i] = "jal " + mapForLabel.get(jumpLabel);
                         }
                     } else {
-                        address = (+address + 4).toFixed();
+                        this.errMsg = this.errMsg + "Error 329: Operand is of incorrect type. -- " + this.sourceIns[i] + "\n";
+                        return false;
                     }
                 } else if (operator == "beq" || operator == "bne") {
                     jumpLabel = this.sourceIns[i].substring(this.sourceIns[i].lastIndexOf(",") + 1, this.sourceIns[i].length).trim();
-                    for (j = 0; j < jumpLabel.length; j++) {
-                        if (j == 0 && jumpLabel.charAt(0) == "-") {
-                            continue;
-                        }
-                        if (!patt2.test(jumpLabel.charAt(j))) {
-                            labelFlag = true;
-                            break;
+                    if (mapForLabel.has(jumpLabel)) {
+                        relativeJump = +(mapForCounter.get(jumpLabel) + "") - instructionCounter - 1;
+                        if (operator == "beq") {
+                            this.sourceIns[i] = "beq" + this.sourceIns[i].substring(posOfSpace, this.sourceIns[i].lastIndexOf(",") + 1) + relativeJump.toFixed();
                         } else {
-                            labelFlag = false;
-                        }
-                    }
-                    if (labelFlag) {
-                        if (mapForLabel.has(jumpLabel)) {
-                            relativeJump = +(mapForCounter.get(jumpLabel) + "") - instructionCounter - 1;
-                            if (operator == "beq") {
-                                this.sourceIns[i] = "beq" + this.sourceIns[i].substring(posOfSpace, this.sourceIns[i].lastIndexOf(",") + 1) + relativeJump.toFixed();
-                            } else {
-                                this.sourceIns[i] = "bne" + this.sourceIns[i].substring(posOfSpace, this.sourceIns[i].lastIndexOf(",") + 1) + relativeJump.toFixed();
-                            }
-                            address = (+address + 4).toFixed();
-                        } else {
-                            console.log("Error 11 in Assembler. Label is not found.");
-                            return false;
+                            this.sourceIns[i] = "bne" + this.sourceIns[i].substring(posOfSpace, this.sourceIns[i].lastIndexOf(",") + 1) + relativeJump.toFixed();
                         }
                     } else {
-                        address = (+address + 4).toFixed();
+                        this.errMsg = this.errMsg + "Error 330: Label is not found. -- " + this.sourceIns[i] + "\n";
+                        return false;
                     }
                 }
                 this.basic.add(trimSpace(this.sourceIns[i]));
@@ -815,12 +785,13 @@ export class Assembler {
                 let expectedNumComma: number | undefined = MapForCommaNum.getMap().get(operator);
                 let actualNumComma = ins.split(",").length - 1;
                 if (expectedNumComma == undefined) {
+                    this.errMsg = this.errMsg + "Error 331: Instruction unrecognized. -- " + this.basic.get(i) + "\n";
                     console.log("Error 1 in Assembler. Instruction unrecognized.");
                     return false;
                 } else if (expectedNumComma == actualNumComma) {
                     let type: string | undefined = MapForInsType.getMap().get(operator);
                     if (type == undefined) {
-                        console.log("Error 2 in Assembler.");
+                        this.errMsg = this.errMsg + "Error 332: Instruction unrecognized. -- " + this.basic.get(i) + "\n";
                         return false;
                     } else {
                         switch (type) {
@@ -830,7 +801,7 @@ export class Assembler {
                                     this.decoderForR.decode();
                                     this.bin.add(this.decoderForR.getBinIns());
                                 } else {
-                                    console.log("Error 3 in Assembler. Invalid instruction.");
+                                    this.errMsg = this.decoderForR.getErrMsg();
                                     return false;
                                 }
                                 break;
@@ -840,7 +811,7 @@ export class Assembler {
                                     this.decoderForI.decode();
                                     this.bin.add(this.decoderForI.getBinIns());
                                 } else {
-                                    console.log("Error 4 in Assembler. Invalid instruction.");
+                                    this.errMsg = this.decoderForI.getErrMsg();
                                     return false;
                                 }
                                 break;
@@ -850,21 +821,21 @@ export class Assembler {
                                     this.decoderForJ.decode();
                                     this.bin.add(this.decoderForJ.getBinIns());
                                 } else {
-                                    console.log("Error 5 in Assembler. Invalid instruction.");
+                                    this.errMsg = this.decoderForJ.getErrMsg();
                                     return false;
                                 }
                                 break;
                             default:
-                                console.log("Error 6 in Assembler. Unrecognized instruction type.");
+                                this.errMsg = this.errMsg + "Error 333: Instruction unrecognized. -- " + this.basic.get(i) + "\n";
                                 return false;
                         }
                     }
                 } else {
-                    console.log("Error 7 in Assembler. Invalid instruction.");
+                    this.errMsg = this.errMsg + "Error 334: Too few or incorrectly formatted operands. -- " + this.basic.get(i) + "\n";
                     return false;
                 }
             } else {
-                console.log("Error 8 in Assembler. Instruction unrecognized.");
+                this.errMsg = this.errMsg + "Error 335: Instruction unrecognized. -- " + this.basic.get(i) + "\n";
                 return false;
             }
         }

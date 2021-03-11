@@ -6,6 +6,7 @@ const InstructionJ_1 = require("./InstructionJ");
 class DecoderForJ extends Decoder_1.Decoder {
     constructor() {
         super();
+        this.errMsg = "";
     }
     static getDecoder() {
         return this.decoder;
@@ -15,7 +16,7 @@ class DecoderForJ extends Decoder_1.Decoder {
         let operandADDRESS = this.ins.substring(posOfSpace + 1, this.ins.length);
         let patt1 = /^[0-9]+$/;
         if (!patt1.test(operandADDRESS)) {
-            console.log("Error 1 in DecoderForJ. Invalid address.");
+            this.errMsg = this.errMsg + "Error 208: Invalid address. -- " + this.getIns() + "\n";
             return false;
         }
         return true;
@@ -23,6 +24,9 @@ class DecoderForJ extends Decoder_1.Decoder {
     decode() {
         let instruction = new InstructionJ_1.InstructionJ(this.ins);
         this.binIns = instruction.getBinIns();
+    }
+    getErrMsg() {
+        return this.errMsg;
     }
 }
 exports.DecoderForJ = DecoderForJ;

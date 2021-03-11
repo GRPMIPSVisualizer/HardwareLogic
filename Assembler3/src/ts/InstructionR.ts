@@ -13,6 +13,7 @@ export class InstructionR extends Instruction{
     private rd: string;
     private shamt: string;
     private funct: string;
+    private errMsg: string = "";
 
     //The ins should be in the form like "add $8,$16,$17".
     //There should be only one space between the operator and the first operand, no other space existing.
@@ -23,7 +24,7 @@ export class InstructionR extends Instruction{
         let functBin: string | undefined = MapForR.getMap().get(this.operator);
         if (functBin == undefined) {
             this.funct = "XXXXXX";
-            console.log("Error in constructor for InstructionR.");
+            this.errMsg = this.errMsg + "Error 103: Failed to construct type-R instruction. -- " + ins + "\n";
         } else {
             this.funct = functBin;
         }
@@ -57,5 +58,9 @@ export class InstructionR extends Instruction{
             this.shamt = "00000";
         }
         this.binIns = this.op + this.rs + this.rt + this.rd + this.shamt + this.funct;
+    }
+
+    public getErrMsg(): string {
+        return this.errMsg;
     }
 }

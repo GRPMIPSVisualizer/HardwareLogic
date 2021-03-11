@@ -10,10 +10,11 @@ class InstructionI extends Instruction_1.Instruction {
     //The register should be in dollar sign and a number.
     constructor(ins) {
         super(ins);
+        this.errMsg = "";
         let opBin = MapForI_1.MapForI.getMap().get(this.operator);
         if (opBin == undefined) {
             this.op = "XXXXXX";
-            console.log("Error in constructor for InstructionR.");
+            this.errMsg = this.errMsg + "Error 101: Failed to construct type-I instruction. -- " + ins + "\n";
         }
         else {
             this.op = opBin;
@@ -63,6 +64,9 @@ class InstructionI extends Instruction_1.Instruction {
             this.imm = DecimalToBinary_1.decimalToBinary(+this.operandIMM, 16);
         }
         this.binIns = this.op + this.rs + this.rt + this.imm;
+    }
+    getErrMsg() {
+        return this.errMsg;
     }
 }
 exports.InstructionI = InstructionI;
