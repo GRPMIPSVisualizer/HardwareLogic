@@ -8,7 +8,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const ArrayList_1 = require("./ArrayList");
 const Assembler_1 = require("./Assembler");
 let assembler = Assembler_1.Assembler.getAssembler();
-assembler.setSources(".data" + "\n" + ".ascii" + "\n" + "\"s\"" + "\n" + ".text" + "\n" + "main: " + "\n" + "add $s1,$s2,$s3" + "\n" + "beq $s1,$s2,main");
+assembler.setSources(".text" + "\n" + "main: " + "\n" + "la $a0, str" + "\n" + ".data" + "\n" + "str: " + "\n" + ".ascii" + "\n" + "\"s\"");
 //assembler.setSources(".data" + "\n" + "item:" + "\n" + ".ascii \"s\"" + "\n" + ".word 33" + "\n" + "item2:" + "\n" + ".asciiz" + "\n" + "\"scc\"" + "\n" + ".text" + "\n" + "la $t1,item");
 //assembler.setSources("sub $s1, $s2, $s3" + "\n" + ".text" + "\n" + ".globl main" + "\n" + "addi $s1,$s2,100" + "\n" + ".text" + "\n" + "addi $s1,$s2,10" + "\n" + ".data" + "\n" + ".asciiz  10000" + "\n" + ".data" + "\n" + ".byte 7890" + "\n" + ".text" + "\n" + "beq $t1,$t2,main" + "\n" + "main:" + "addi $s1,$s2,10" + "\n" + "j main" + "\n" + "beq $t1,$t2,-1");
 if (assembler.preprocess()) {

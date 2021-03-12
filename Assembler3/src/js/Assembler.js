@@ -321,7 +321,7 @@ class Assembler {
             let ins = this.data.get(i).toString();
             let posOfColon = ins.indexOf(":");
             if (posOfColon != -1) {
-                label = ins.substring(0, posOfColon);
+                label = ins.substring(0, posOfColon).trim();
                 this.mapForDataLabel.set(label, address);
                 let insAfterLabel = ins.substring(posOfColon + 2, ins.length);
                 posOfSpace = insAfterLabel.indexOf(" ");
@@ -649,7 +649,7 @@ class Assembler {
                             ins0 = "addiu " + operand0 + ",$0," + operand1;
                         }
                         else if (operator == "la") {
-                            if (this.mapForDataLabel.has(operand1)) {
+                            if (this.mapForDataLabel.has(operand1.trim())) {
                                 let address = DecimalToBinary_1.decimalToBinary(+(this.mapForDataLabel.get(operand1) + ""), 32);
                                 let first16bits = BinaryToDecimal_1.binaryToDecimal(address.substring(0, 16));
                                 let last16bits = BinaryToDecimal_1.binaryToDecimal(address.substring(16));

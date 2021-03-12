@@ -319,7 +319,7 @@ export class Assembler {
             let ins: string = this.data.get(i).toString();
             let posOfColon: number = ins.indexOf(":");
             if (posOfColon != -1) {
-                label = ins.substring(0, posOfColon);
+                label = ins.substring(0, posOfColon).trim();
                 this.mapForDataLabel.set(label, address);
                 let insAfterLabel = ins.substring(posOfColon + 2, ins.length);
                 posOfSpace = insAfterLabel.indexOf(" ");
@@ -607,15 +607,14 @@ export class Assembler {
                         } else if (operator == "li") {
                             ins0 = "addiu " + operand0 + ",$0," + operand1;
                         } else if (operator == "la") {
-                            if (this.mapForDataLabel.has(operand1)) {
+                            if (this.mapForDataLabel.has(operand1.trim())) {
                                 let address: string = decimalToBinary(+(this.mapForDataLabel.get(operand1) + ""), 32);
                                 let first16bits = binaryToDecimal(address.substring(0, 16));
                                 let last16bits = binaryToDecimal(address.substring(16));
                                 ins0 = "lui $1," + first16bits;
                                 ins1 = "ori " + operand0 + ",$1," + last16bits;
                                 console.log(address);
-                            }
-                            else {
+                            } else {
                                 this.errMsg = this.errMsg + "Error 324: Label unrecongnized. -- " + this.sourceIns[i] + "\n";
                                 return false;
                             }
