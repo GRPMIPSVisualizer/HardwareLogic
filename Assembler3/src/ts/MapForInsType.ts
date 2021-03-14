@@ -1,65 +1,59 @@
 export class MapForInsType {
 
-    private static map = new Map();
+    private static map = new Map([
+        ["add", "R"],
+        ["addu", "R"],
+        ["sub", "R"],
+        ["subu", "R"],
+        ["and", "R"],
+        ["or", "R"],
+        ["nor", "R"],
+        ["slt", "R"],
+        ["sltu", "R"],
+        ["sll", "R"],
+        ["srl", "R"],
+        ["jr", "R"],
+        ["sra", "R"],
 
-    private constructor() {}
+        ["addi", "I"],
+        ["addiu", "I"],
+        ["andi", "I"],
+        ["beq", "I"],
+        ["bne", "I"],
+        ["lbu", "I"],
+        ["lhu", "I"],
+        ["llOp", "I"],
+        ["lui", "I"],
+        ["lw", "I"],
+        ["ori", "I"],
+        ["slti", "I"],
+        ["sltiu", "I"],
+        ["sb", "I"],
+        ["sc", "I"],
+        ["sh", "I"],
+        ["sw", "I"],
+
+        ["j", "J"],
+        ["jal", "J"],
+
+        ["abs", "P"],
+        ["blt", "P"],
+        ["bgt", "P"],
+        ["ble", "P"],
+        ["neg", "P"],
+        ["negu", "P"],
+        ["not", "P"],
+        ["bge", "P"],
+        ["li", "P"],
+        ["la", "P"],
+        ["move", "P"],
+        ["sge", "P"],
+        ["sgt", "P"]
+    ]);
+
+    private constructor() { }
 
     public static getMap(): Map<string, string> {
-        if (this.map.size == 0) {
-            let typeR: string = "R";
-            let typeI: string = "I";
-            let typeJ: string = "J";
-            let typeP: string = "P";
-
-            this.map.set("add", typeR);
-            this.map.set("addu", typeR);
-            this.map.set("sub", typeR);
-            this.map.set("subu", typeR);
-            this.map.set("and", typeR);
-            this.map.set("or", typeR);
-            this.map.set("nor", typeR);
-            this.map.set("slt", typeR);
-            this.map.set("sltu", typeR);
-            this.map.set("sll", typeR);
-            this.map.set("srl", typeR);
-            this.map.set("jr", typeR);
-            this.map.set("sra", typeR);
-
-            this.map.set("addi", typeI);
-            this.map.set("addiu", typeI);
-            this.map.set("andi", typeI);
-            this.map.set("beq", typeI);
-            this.map.set("bne", typeI);
-            this.map.set("lbu", typeI);
-            this.map.set("lhu", typeI);
-            this.map.set("llOp", typeI);
-            this.map.set("lui", typeI);
-            this.map.set("lw", typeI);
-            this.map.set("ori", typeI);
-            this.map.set("slti", typeI);
-            this.map.set("sltiu", typeI);
-            this.map.set("sb", typeI);
-            this.map.set("sc", typeI);
-            this.map.set("sh", typeI);
-            this.map.set("sw", typeI);
-
-            this.map.set("j", typeJ);
-            this.map.set("jal", typeJ);
-
-            this.map.set("abs", typeP);
-            this.map.set("blt", typeP);
-            this.map.set("bgt", typeP);
-            this.map.set("ble", typeP);
-            this.map.set("neg", typeP);
-            this.map.set("negu", typeP);
-            this.map.set("not", typeP);
-            this.map.set("bge", typeP);
-            this.map.set("li", typeP);
-            this.map.set("la", typeP);
-            this.map.set("move", typeP);
-            this.map.set("sge", typeP);
-            this.map.set("sgt", typeP);
-        }
         return this.map;
     }
 }

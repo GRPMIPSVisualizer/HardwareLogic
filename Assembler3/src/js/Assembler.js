@@ -45,7 +45,6 @@ class Assembler {
     getMapForByte() {
         return this.mapForByte;
     }
-    //To be deleted
     getSourceInsAL() {
         return this.sourceInsAL;
     }
@@ -580,6 +579,7 @@ class Assembler {
         let temp = [];
         for (i = 0; i < this.sourceIns.length; i++) {
             if (this.sourceIns[i] == "syscall") {
+                temp.push(this.sourceIns[i]);
                 continue;
             }
             posOfSpace = this.sourceIns[i].indexOf(" ");
@@ -655,7 +655,6 @@ class Assembler {
                                 let last16bits = BinaryToDecimal_1.binaryToDecimal(address.substring(16));
                                 ins0 = "lui $1," + first16bits;
                                 ins1 = "ori " + operand0 + ",$1," + last16bits;
-                                console.log(address);
                             }
                             else {
                                 this.errMsg = this.errMsg + "Error 324: Label unrecongnized. -- " + this.sourceIns[i] + "\n";
